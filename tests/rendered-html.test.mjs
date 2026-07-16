@@ -76,3 +76,16 @@ test("ships the complete sharded candidate-affidavit archive", async () => {
   assert.ok(elections.every((election) => election.complete && election.candidateCount === election.expectedFromOrdinals));
   assert.equal(elections.reduce((sum, election) => sum + election.candidateCount, 0), 153470);
 });
+
+test("opens people on a dedicated internal profile route", async () => {
+  const [home, person] = await Promise.all([
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/person/page.tsx", import.meta.url), "utf8"),
+  ]);
+  assert.match(home, /\/person\?type=current&rank=/);
+  assert.match(home, /\/person\?type=candidate&election=/);
+  assert.match(person, /CANDIDATE AFFIDAVIT PROFILE/);
+  assert.match(person, /SITTING MLA PROFILE/);
+  assert.match(person, /Declared assets over time/);
+  assert.match(person, /Back to database/);
+});
