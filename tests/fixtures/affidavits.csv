@@ -1,0 +1,3 @@
+state,state_code,assembly_seats,constituency_no,constituency,year,candidate,party,winner,total_assets,liabilities,affidavit_url,source_url,criminal_cases
+Example Pradesh,EX,2,1,North Seat,2024,Asha Kumar,IND,true,12500000,500000,https://example.gov/affidavit/asha,https://example.gov/results,0
+Example Pradesh,EX,2,2,South Seat,2024,Ravi Singh,JP,false,8000000,1000000,https://example.gov/affidavit/ravi,https://example.gov/results,2
