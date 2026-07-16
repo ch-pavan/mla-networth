@@ -24,7 +24,7 @@ test("ships source links and appropriate data caveats", async () => {
   assert.match(page, /https:\/\/www\.myneta\.info\//);
   assert.match(page, /self-sworn election affidavit/);
   assert.match(page, /not independently audited market wealth/);
-  assert.match(page, /nationwide snapshot contains 4,092 sitting MLAs/);
+  assert.match(page, /It also contains 4,092 sitting MLAs/);
 });
 
 test("ships the complete ADR 2025 sitting-MLA appendix", async () => {
@@ -61,4 +61,18 @@ test("ships the historical constituency-winner archive", async () => {
   assert.deepEqual([archive.meta.firstYear, archive.meta.latestYear], [2004, 2025]);
   assert.equal(new Set(archive.records.map((row) => `${row.electionFolder}|${row.candidateId}`)).size, 13916);
   assert.ok(archive.records.every((row) => row.name && row.constituency && row.candidateUrl.startsWith("https://www.myneta.info/")));
+});
+
+test("ships the complete sharded candidate-affidavit archive", async () => {
+  const index = JSON.parse(await readFile(new URL("../public/data/candidates/index.json", import.meta.url), "utf8"));
+  const elections = index.states.flatMap((state) => state.elections);
+  assert.equal(index.meta.parserVersion, 3);
+  assert.equal(index.meta.electionFolders, 121);
+  assert.equal(index.meta.completeElectionFolders, 121);
+  assert.equal(index.meta.candidateRecords, 153470);
+  assert.equal(index.meta.states, 31);
+  assert.deepEqual([index.meta.firstYear, index.meta.latestYear], [2004, 2025]);
+  assert.equal(elections.length, 121);
+  assert.ok(elections.every((election) => election.complete && election.candidateCount === election.expectedFromOrdinals));
+  assert.equal(elections.reduce((sum, election) => sum + election.candidateCount, 0), 153470);
 });

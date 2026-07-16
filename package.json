@@ -14,7 +14,8 @@
     "db:generate": "drizzle-kit generate",
     "data:import": "node scripts/import-affidavits.mjs",
     "data:history": "node scripts/fetch-recontest-history.mjs",
-    "data:winners": "node scripts/fetch-winner-archive.mjs"
+    "data:winners": "node scripts/fetch-winner-archive.mjs",
+    "data:candidates": "node scripts/fetch-candidate-archive.mjs"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",

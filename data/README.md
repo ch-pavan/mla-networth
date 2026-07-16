@@ -36,3 +36,9 @@ The live join requires matching state, election year, normalized name, and exact
 `npm run data:winners` reads the election folders discovered by the history crawler and retrieves every paginated MyNeta `winner_analyzed` table. It retains the source spelling of each constituency and candidate, the election folder, candidate ID and direct profile URL, party, education, criminal-case count, assets and liabilities. The generated archive includes a page-level source fingerprint rolled up for every election folder.
 
 Seat histories currently group on normalized state and constituency labels. Delimitation, renamed seats and materially different source spellings are kept separate until an explicit constituency-lineage table can establish the relationship without guessing.
+
+## Complete candidate archive
+
+`npm run data:candidates` imports every paginated `candidates_analyzed` table from the 121 discovered state-election folders. The importer evaluates MyNeta's obfuscated table-row scripts inside an isolated VM with only a stubbed `document.write`, and uses alphabetical pagination to avoid unstable ordering among candidates with identical asset values. Every election is stored as a separate on-demand JSON shard with its source URL, page fingerprint, expected ordinal count and completeness flag.
+
+The internal website loads only the selected election shard. Candidate profiles, asset values, liabilities, education, criminal-case counts and exact-name histories are displayed inside NetaWorth; outbound source URLs are retained only for verification.
