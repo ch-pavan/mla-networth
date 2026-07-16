@@ -24,3 +24,9 @@ All monetary values are integer rupees. Each row represents one candidate in one
 - `verified`: checked against the linked ECI affidavit.
 
 The importer rejects duplicate candidacies, negative monetary values, missing identity fields and non-HTTPS affidavit links. Every run records a SHA-256 source fingerprint and a rejection report.
+
+## Historical comparison snapshot
+
+`npm run data:history` starts with MyNeta's published re-contesting-candidate table for the latest election in each of 31 assemblies, then follows each documented predecessor folder back through 2004 where available. The generated snapshot records the current and previous affidavit values, percentage change, MyNeta identity remarks, comparison URL, source-page SHA-256 fingerprints, and whether the newest comparison matched the current national sitting-MLA snapshot.
+
+The live join requires matching state, election year, normalized name, and exact current asset value. Older points are appended only when one comparison's previous year and asset value exactly equal the next comparison's current side. Comparisons that do not pass remain in the research dataset but are not attached to a live MLA profile until identity review resolves spelling changes, reordered names, party switches, or constituency moves.

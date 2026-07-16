@@ -36,3 +36,17 @@ test("ships the complete ADR 2025 sitting-MLA appendix", async () => {
   assert.equal(new Set(snapshot.records.map((row) => row.state)).size, 31);
   assert.ok(snapshot.records.every((row) => row.name && row.constituency && row.state && row.assets >= 0));
 });
+
+test("ships national two-election wealth comparisons", async () => {
+  const history = JSON.parse(await readFile(new URL("../public/data/adr-recontest-history.json", import.meta.url), "utf8"));
+  assert.equal(history.meta.statesRequested, 31);
+  assert.equal(history.meta.electionPagesChecked, 121);
+  assert.equal(history.meta.electionPagesAvailable, 94);
+  assert.equal(history.meta.comparisonCount, 7723);
+  assert.equal(history.comparisons.length, 7723);
+  assert.equal(history.meta.snapshotMatchCount, 1376);
+  assert.deepEqual([history.meta.firstYear, history.meta.latestYear], [2004, 2025]);
+  assert.ok(history.comparisons.every((row) => row.previousYear < row.currentYear));
+  assert.ok(history.comparisons.every((row) => row.currentAssets >= 0 && row.previousAssets >= 0));
+  assert.ok(history.comparisons.every((row) => row.comparisonUrl.startsWith("https://www.myneta.info/")));
+});
