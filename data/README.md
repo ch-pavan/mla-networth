@@ -30,3 +30,9 @@ The importer rejects duplicate candidacies, negative monetary values, missing id
 `npm run data:history` starts with MyNeta's published re-contesting-candidate table for the latest election in each of 31 assemblies, then follows each documented predecessor folder back through 2004 where available. The generated snapshot records the current and previous affidavit values, percentage change, MyNeta identity remarks, comparison URL, source-page SHA-256 fingerprints, and whether the newest comparison matched the current national sitting-MLA snapshot.
 
 The live join requires matching state, election year, normalized name, and exact current asset value. Older points are appended only when one comparison's previous year and asset value exactly equal the next comparison's current side. Comparisons that do not pass remain in the research dataset but are not attached to a live MLA profile until identity review resolves spelling changes, reordered names, party switches, or constituency moves.
+
+## Constituency winner archive
+
+`npm run data:winners` reads the election folders discovered by the history crawler and retrieves every paginated MyNeta `winner_analyzed` table. It retains the source spelling of each constituency and candidate, the election folder, candidate ID and direct profile URL, party, education, criminal-case count, assets and liabilities. The generated archive includes a page-level source fingerprint rolled up for every election folder.
+
+Seat histories currently group on normalized state and constituency labels. Delimitation, renamed seats and materially different source spellings are kept separate until an explicit constituency-lineage table can establish the relationship without guessing.
