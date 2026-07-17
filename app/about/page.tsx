@@ -13,7 +13,11 @@ export default function AboutPage() {
         <Link className="brand" href="/" aria-label="NetaWorth home">
           <span className="brandMark">न</span><span>NETA<strong>WORTH</strong></span>
         </Link>
-        <Link className="backLink" href="/">← Back to the database</Link>
+        <nav aria-label="Primary" className="mapPageNav">
+          <Link href="/">Database</Link>
+          <Link href="/map">Map</Link>
+          <Link href="/about" aria-current="page">About</Link>
+        </nav>
       </header>
 
       <section className="infoHero">

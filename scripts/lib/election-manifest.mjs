@@ -10,6 +10,16 @@ const REVIEW_BASIS = new Set([
   "local-candidate-archive",
   "public-folder-review",
 ]);
+const CHAMBERS = new Set(["assembly", "lok_sabha"]);
+const ELECTION_KEYS = [
+  "state",
+  "year",
+  "folder",
+  "indexUrl",
+  "availability",
+  "reviewBasis",
+];
+const ELECTION_KEYS_WITH_CHAMBER = [...ELECTION_KEYS, "chamber"];
 
 function assertRecord(value, path) {
   if (value === null || typeof value !== "object" || Array.isArray(value)) {
@@ -162,12 +172,18 @@ export function validateElectionManifest(manifest) {
   for (const [index, entry] of manifest.elections.entries()) {
     const path = `manifest.elections[${index}]`;
     assertRecord(entry, path);
+    const entryKeys = Object.keys(entry);
+    const allowsChamber = entryKeys.includes("chamber");
     assertExactKeys(
       entry,
-      ["state", "year", "folder", "indexUrl", "availability", "reviewBasis"],
+      allowsChamber ? ELECTION_KEYS_WITH_CHAMBER : ELECTION_KEYS,
       path,
     );
     validateCommonEntry(entry, path);
+    if (allowsChamber && !CHAMBERS.has(entry.chamber)) {
+      throw new TypeError(`${path}.chamber must be assembly or lok_sabha`);
+    }
+    if (!allowsChamber) entry.chamber = "assembly";
     if (!AVAILABILITY.has(entry.availability)) {
       throw new TypeError(`${path}.availability is not supported`);
     }

@@ -6,6 +6,7 @@ import "./archive-integrity.test.mjs";
 import "./data-parsers.test.mjs";
 import "./election-manifest.test.mjs";
 import "./format-money.test.mjs";
+import "./geo-map.test.mjs";
 import "./import-affidavits.test.mjs";
 import "./profile-history.test.mjs";
 import "./winner-history.test.mjs";

@@ -33,17 +33,21 @@ const REQUIRED_LEGACY_FOLDERS = [
 
 test("reviewed manifest enumerates imported, pending, legacy, and excluded folders", async () => {
   const manifest = await loadElectionManifest();
-  assert.equal(manifest.elections.length, 135);
+  assert.equal(manifest.elections.length, 140);
   assert.equal(
     manifest.elections.filter(({ availability }) => availability === "imported")
       .length,
-    121,
+    122,
   );
   assert.equal(
     manifest.elections.filter(
       ({ availability }) => availability === "verified-not-imported",
     ).length,
-    14,
+    18,
+  );
+  assert.equal(
+    manifest.elections.filter((entry) => entry.chamber === "lok_sabha").length,
+    5,
   );
 
   for (const [state, year, folder] of REQUIRED_ADDITIONS) {

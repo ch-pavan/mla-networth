@@ -18,21 +18,34 @@
     "data:import": "node scripts/import-affidavits.mjs",
     "data:history": "node scripts/fetch-recontest-history.mjs",
     "data:winners": "node scripts/fetch-winner-archive.mjs",
-    "data:candidates": "node scripts/fetch-candidate-archive.mjs"
+    "data:candidates": "node scripts/fetch-candidate-archive.mjs",
+    "data:loksabha": "node scripts/fetch-candidate-archive.mjs --chamber=lok_sabha && node scripts/fetch-winner-archive.mjs --chamber=lok_sabha && node scripts/build-lok-sabha-sitting-mps.mjs",
+    "data:loksabha:quick": "node scripts/fetch-winner-archive.mjs --chamber=lok_sabha --summary-money && node scripts/build-lok-sabha-sitting-mps.mjs",
+    "data:loksabha:mps": "node scripts/build-lok-sabha-sitting-mps.mjs",
+    "data:rajyasabha": ".venv-adr/bin/python scripts/extract-adr-rajya-sabha.py work/adr-pdfs/sitting-rajya-sabha-march-2026.pdf public/data/rajya-sabha-sitting-mps.json",
+    "data:match-geo": "node scripts/match-constituencies.mjs"
   },
   "dependencies": {
+    "d3-geo": "^3.1.1",
+    "d3-scale": "^4.0.2",
     "drizzle-orm": "0.45.2",
     "next": "16.2.6",
     "react": "19.2.6",
-    "react-dom": "19.2.6"
+    "react-dom": "19.2.6",
+    "topojson-client": "^3.1.0"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.37.1",
     "@cloudflare/workers-types": "^4.20260702.1",
     "@tailwindcss/postcss": "4.2.1",
+    "@types/d3-geo": "^3.1.0",
+    "@types/d3-scale": "^4.0.9",
+    "@types/geojson": "^7946.0.16",
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
+    "@types/topojson-client": "^3.1.5",
+    "@types/topojson-specification": "^1.0.5",
     "@vitejs/plugin-react": "6.0.2",
     "@vitejs/plugin-rsc": "0.5.26",
     "drizzle-kit": "0.31.10",

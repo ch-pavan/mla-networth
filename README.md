@@ -1,6 +1,6 @@
 # NetaWorth
 
-Public ledger of wealth declared by India’s elected representatives — sitting MLAs, winners, and candidates from reviewed state-assembly election sources.
+Public ledger of wealth declared by India’s elected representatives — sitting MLAs, Lok Sabha MPs, winners, and candidates from reviewed election sources.
 
 Data comes from election affidavits (ECI / ADR / MyNeta). Figures are self-declared, not independently audited market wealth.
 
@@ -23,8 +23,11 @@ The development server prints its local URL. The application does not require a 
 The shipped product is a client-rendered Next.js App Router application built with [vinext](https://github.com/cloudflare/vinext). Its live data source is generated, versioned JSON under `public/data/`:
 
 - `adr-sitting-mlas-2025.json` is the current nationwide sitting-MLA snapshot.
+- `lok-sabha-sitting-mps.json` is the current Lok Sabha MP snapshot (derived from latest general-election winners).
+- `rajya-sabha-sitting-mps.json` is the current Rajya Sabha MP snapshot (ADR March 2026 PDF extract).
 - `adr-recontest-history.json` contains attributed affidavit-to-affidavit comparisons.
-- `adr-winner-archive.json` contains constituency winner records.
+- `adr-winner-archive.json` contains assembly constituency winner records.
+- `lok-sabha-winner-archive.json` contains Lok Sabha winner records (2004–2024).
 - `candidates/index.json` and the election shards beside it contain the candidate archive.
 
 `data/election-manifest.json` is the reviewed source-coverage input for the candidate, winner, and recontest generators. It contains 135 included MyNeta election folders: 121 represented in the local candidate archive at review time and 14 additional public folders verified during review. One folder is explicitly excluded because the required analyzed-summary pages were unavailable. These counts describe reviewed and imported MyNeta source coverage, not an exhaustive census of every election conducted by the ECI.

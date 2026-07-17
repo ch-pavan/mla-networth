@@ -10,7 +10,12 @@ import {
   writeJsonAtomic,
 } from "./lib/archive-generation.mjs";
 import { loadElectionManifest } from "./lib/election-manifest.mjs";
+import { filterManifestElections, parseArchiveCliArgs } from "./lib/archive-cli.mjs";
 import { deobfuscateMynetaHtml } from "./lib/myneta-html.mjs";
+import {
+  parseLokSabhaConstituencyStates,
+  resolveLokSabhaState,
+} from "./lib/lok-sabha-geography.mjs";
 import {
   countMynetaRecordStatuses,
   decodeMynetaCell,
@@ -18,10 +23,19 @@ import {
   parseMynetaMoneyCell,
 } from "./lib/myneta-records.mjs";
 
+const cliFilters = parseArchiveCliArgs();
 const reviewedManifest = await loadElectionManifest();
-const elections = reviewedManifest.elections
-  .map((entry) => ({ ...entry, year: entry.year }))
-  .sort((left, right) => left.state.localeCompare(right.state) || left.year - right.year);
+const elections = filterManifestElections(
+  reviewedManifest.elections.map((entry) => ({ ...entry, year: entry.year })),
+  cliFilters,
+).sort((left, right) => left.state.localeCompare(right.state) || left.year - right.year);
+if (!elections.length) {
+  throw new Error("No elections matched the archive CLI filters");
+}
+const lokSabhaOnly = elections.every((election) => (election.chamber ?? "assembly") === "lok_sabha");
+const outputPath = lokSabhaOnly
+  ? "public/data/lok-sabha-winner-archive.json"
+  : "public/data/adr-winner-archive.json";
 const requestLimit = createLimiter(8);
 const normalize = (value) => value
   .normalize("NFKD")
@@ -114,6 +128,7 @@ function candidateProfileUrlForRecord(election, candidateId) {
 }
 
 async function loadCandidateMoneyIndex() {
+  if (cliFilters.summaryMoney) return new Map();
   const index = new Map();
   for (const election of elections) {
     const shardFile = new URL(
@@ -148,6 +163,20 @@ async function loadCandidateMoneyIndex() {
 }
 
 const candidateMoneyIndex = await loadCandidateMoneyIndex();
+const constituencyStateMaps = new Map();
+if (lokSabhaOnly) {
+  await Promise.all(elections.map(async (election) => {
+    const geographyUrl = `https://www.myneta.info/${election.folder}/`;
+    const html = await requestLimit(async () => {
+      const response = await fetch(geographyUrl, {
+        headers: { "user-agent": "NetaWorth public-interest data index; source attribution included" },
+      });
+      if (!response.ok) throw new Error(`Failed geography index for ${election.folder}: HTTP ${response.status}`);
+      return response.text();
+    });
+    constituencyStateMaps.set(election.folder.toLowerCase(), parseLokSabhaConstituencyStates(html));
+  }));
+}
 const firstPages = await Promise.all(elections.map((election) => getSummaryPage({ ...election, page: 1 })));
 const remaining = [];
 for (const page of firstPages) {
@@ -172,10 +201,20 @@ for (const page of pages) {
   }
 }
 
-const records = parsedRecords.map((winner) => reconcileWinnerMoney(
-  winner,
-  candidateMoneyIndex.get(`${winner.electionFolder.toLowerCase()}|${winner.candidateId}`),
-));
+const records = parsedRecords.map((winner) => {
+  const candidate = candidateMoneyIndex.get(`${winner.electionFolder.toLowerCase()}|${winner.candidateId}`);
+  const reconciled = cliFilters.summaryMoney
+    ? { ...winner, assetsSource: winner.assetsSource ?? "winner-summary", liabilitiesSource: winner.liabilitiesSource ?? "winner-summary" }
+    : reconcileWinnerMoney(winner, candidate);
+  if (!lokSabhaOnly) return reconciled;
+  const geography = constituencyStateMaps.get(winner.electionFolder.toLowerCase()) ?? new Map();
+  return {
+    ...reconciled,
+    chamber: "lok_sabha",
+    house: "Lok Sabha",
+    state: resolveLokSabhaState(reconciled.baseConstituency || reconciled.constituency, geography),
+  };
+});
 records.sort(
   (left, right) => left.state.localeCompare(right.state)
     || left.electionYear - right.electionYear
@@ -217,7 +256,10 @@ const years = records.map((record) => record.electionYear);
 const moneyConflictRecords = records.filter((record) => record.moneyConflicts);
 const payload = {
   meta: {
-    title: "India state assembly winner archive",
+    title: lokSabhaOnly
+      ? "India Lok Sabha winner archive"
+      : "India state assembly winner archive",
+    chamber: lokSabhaOnly ? "lok_sabha" : "assembly",
     source: "Association for Democratic Reforms / MyNeta",
     retrievedAt: new Date().toISOString(),
     parserVersion: ARCHIVE_PARSER_VERSION,
@@ -234,7 +276,7 @@ const payload = {
       (count, record) => count + Object.keys(record.moneyConflicts).length,
       0,
     ),
-    candidateArchiveCrossCheckComplete: true,
+    candidateArchiveCrossCheckComplete: !cliFilters.summaryMoney,
     states: new Set(records.map((record) => record.state)).size,
     firstYear: Math.min(...years),
     latestYear: Math.max(...years),
@@ -243,5 +285,5 @@ const payload = {
   coverage,
   records,
 };
-await writeJsonAtomic("public/data/adr-winner-archive.json", payload);
-console.log(JSON.stringify(payload.meta, null, 2));
+await writeJsonAtomic(outputPath, payload);
+console.log(JSON.stringify({ outputPath, ...payload.meta }, null, 2));

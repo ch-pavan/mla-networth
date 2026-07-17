@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "source": "DataMeet India assembly constituencies",
+    "license": "CC BY 4.0",
+    "attribution": "DataMeet India community maps",
+    "note": "Telangana polygons are shared from Andhra Pradesh (pre-split source). Jammu Kashmir / Odisha / Uttarakhand names normalized to ADR."
+  },
+  "states": {
+    "Andhra Pradesh": {
+      "file": "ac/andhra-pradesh.json",
+      "featureCount": 296
+    },
+    "Arunachal Pradesh": {
+      "file": "ac/arunachal-pradesh.json",
+      "featureCount": 61
+    },
+    "Assam": {
+      "file": "ac/assam.json",
+      "featureCount": 133
+    },
+    "Bihar": {
+      "file": "ac/bihar.json",
+      "featureCount": 243
+    },
+    "Chhattisgarh": {
+      "file": "ac/chhattisgarh.json",
+      "featureCount": 90
+    },
+    "Delhi": {
+      "file": "ac/delhi.json",
+      "featureCount": 70
+    },
+    "Goa": {
+      "file": "ac/goa.json",
+      "featureCount": 41
+    },
+    "Gujarat": {
+      "file": "ac/gujarat.json",
+      "featureCount": 172
+    },
+    "Haryana": {
+      "file": "ac/haryana.json",
+      "featureCount": 90
+    },
+    "Himachal Pradesh": {
+      "file": "ac/himachal-pradesh.json",
+      "featureCount": 68
+    },
+    "Jammu Kashmir": {
+      "file": "ac/jammu-kashmir.json",
+      "featureCount": 107
+    },
+    "Jharkhand": {
+      "file": "ac/jharkhand.json",
+      "featureCount": 95
+    },
+    "Karnataka": {
+      "file": "ac/karnataka.json",
+      "featureCount": 225
+    },
+    "Kerala": {
+      "file": "ac/kerala.json",
+      "featureCount": 141
+    },
+    "Madhya Pradesh": {
+      "file": "ac/madhya-pradesh.json",
+      "featureCount": 226
+    },
+    "Maharashtra": {
+      "file": "ac/maharashtra.json",
+      "featureCount": 302
+    },
+    "Manipur": {
+      "file": "ac/manipur.json",
+      "featureCount": 68
+    },
+    "Meghalaya": {
+      "file": "ac/meghalaya.json",
+      "featureCount": 60
+    },
+    "Mizoram": {
+      "file": "ac/mizoram.json",
+      "featureCount": 40
+    },
+    "Nagaland": {
+      "file": "ac/nagaland.json",
+      "featureCount": 60
+    },
+    "Odisha": {
+      "file": "ac/odisha.json",
+      "featureCount": 147
+    },
+    "Puducherry": {
+      "file": "ac/puducherry.json",
+      "featureCount": 30
+    },
+    "Punjab": {
+      "file": "ac/punjab.json",
+      "featureCount": 117
+    },
+    "Rajasthan": {
+      "file": "ac/rajasthan.json",
+      "featureCount": 201
+    },
+    "Sikkim": {
+      "file": "ac/sikkim.json",
+      "featureCount": 38
+    },
+    "Tamil Nadu": {
+      "file": "ac/tamil-nadu.json",
+      "featureCount": 234
+    },
+    "Tripura": {
+      "file": "ac/tripura.json",
+      "featureCount": 60
+    },
+    "Uttar Pradesh": {
+      "file": "ac/uttar-pradesh.json",
+      "featureCount": 403
+    },
+    "Uttarakhand": {
+      "file": "ac/uttarakhand.json",
+      "featureCount": 70
+    },
+    "West Bengal": {
+      "file": "ac/west-bengal.json",
+      "featureCount": 294
+    },
+    "Telangana": {
+      "file": "ac/andhra-pradesh.json",
+      "featureCount": 296,
+      "sharedFrom": "Andhra Pradesh"
+    }
+  }
+}

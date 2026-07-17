@@ -10,7 +10,9 @@ The public site treats every wealth figure as an attributed declaration, never a
 
 ## Reviewed source coverage
 
-`data/election-manifest.json` is the explicit input to the candidate, winner, and recontest generators. The current reviewed manifest includes 135 MyNeta state-election folders: 121 had a local candidate shard at review time and 14 additional public folders were verified for import. Karnataka 2004 is recorded separately as excluded because its required candidate and winner analyzed-summary pages were unavailable during review.
+`data/election-manifest.json` is the explicit input to the candidate, winner, and recontest generators. The current reviewed manifest includes 140 MyNeta election folders: 135 state-assembly folders plus 5 Lok Sabha folders (2004–2024). Of the assembly folders, 121 had a local candidate shard at the original review and 14 additional public folders were verified for import. Karnataka 2004 is recorded separately as excluded because its required candidate and winner analyzed-summary pages were unavailable during review.
+
+Lok Sabha entries use `"chamber": "lok_sabha"` and `state: "Lok Sabha"`. Winner records resolve each parliamentary constituency back to its geographic state/UT from the MyNeta index page so seat browsing stays state-aware.
 
 Manifest membership means a MyNeta folder was reviewed under the method recorded in the manifest. It does not claim that MyNeta, ADR, or this repository covers every ECI election or affidavit. Likewise, `sourceRowsComplete` means all ranked rows exposed by a particular analyzed-summary page set were parsed without a rank gap; it is not a claim of electoral completeness.
 

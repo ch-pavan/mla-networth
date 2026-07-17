@@ -81,7 +81,7 @@ export default function PersonPage(){
   const netWorth=profile?declaredNetWorth(profile.assets,profile.liabilities):null;
 
   return <><a className="skipLink" href="#main-content">Skip to public record</a><main className="personPage" id="main-content">
-    <header className="topbar personNav"><Link className="brand" href="/"><span className="brandMark">न</span><span>NETA<strong>WORTH</strong></span></Link><Link className="backLink" href="/">← Back to database</Link></header>
+    <header className="topbar personNav"><Link className="brand" href="/"><span className="brandMark">न</span><span>NETA<strong>WORTH</strong></span></Link><nav aria-label="Primary" className="mapPageNav"><Link href="/">Database</Link><Link href="/map">Map</Link><Link href="/about">About</Link></nav></header>
     {!profile&&!error&&<section className="personLoading"><i></i><p>Opening the public record…</p></section>}
     {error&&<section className="personLoading"><h1>Record unavailable</h1><p>{error}</p><Link href="/">Return to NetaWorth</Link></section>}
     {profile&&<>

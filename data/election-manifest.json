@@ -7,7 +7,7 @@
   "review": {
     "status": "reviewed",
     "reviewedAt": "2026-07-17",
-    "method": "Combined the 121 locally imported candidate-archive folders with manually verified public MyNeta assembly-election folders. Legacy folders absent from the current MyNeta state index were retained when local archive evidence exists."
+      "method": "Combined the 121 locally imported candidate-archive folders with manually verified public MyNeta assembly-election folders, then added the five public Lok Sabha folders (2004–2024). Legacy folders absent from the current MyNeta state index were retained when local archive evidence exists."
   },
   "availabilitySemantics": {
     "imported": "The public MyNeta election folder is represented in the local candidate archive at review time.",
@@ -521,6 +521,51 @@
       "indexUrl": "https://www.myneta.info/ker2006/index.php",
       "availability": "imported",
       "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Lok Sabha",
+      "year": 2024,
+      "folder": "LokSabha2024",
+      "indexUrl": "https://www.myneta.info/LokSabha2024/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive",
+      "chamber": "lok_sabha"
+    },
+    {
+      "state": "Lok Sabha",
+      "year": 2019,
+      "folder": "LokSabha2019",
+      "indexUrl": "https://www.myneta.info/LokSabha2019/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review",
+      "chamber": "lok_sabha"
+    },
+    {
+      "state": "Lok Sabha",
+      "year": 2014,
+      "folder": "ls2014",
+      "indexUrl": "https://www.myneta.info/ls2014/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review",
+      "chamber": "lok_sabha"
+    },
+    {
+      "state": "Lok Sabha",
+      "year": 2009,
+      "folder": "ls2009",
+      "indexUrl": "https://www.myneta.info/ls2009/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review",
+      "chamber": "lok_sabha"
+    },
+    {
+      "state": "Lok Sabha",
+      "year": 2004,
+      "folder": "loksabha2004",
+      "indexUrl": "https://www.myneta.info/loksabha2004/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review",
+      "chamber": "lok_sabha"
     },
     {
       "state": "Madhya Pradesh",

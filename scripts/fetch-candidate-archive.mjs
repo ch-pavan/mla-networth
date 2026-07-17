@@ -12,6 +12,7 @@ import {
   writeJsonAtomic,
 } from "./lib/archive-generation.mjs";
 import { loadElectionManifest } from "./lib/election-manifest.mjs";
+import { filterManifestElections, parseArchiveCliArgs } from "./lib/archive-cli.mjs";
 import { deobfuscateMynetaHtml } from "./lib/myneta-html.mjs";
 import {
   countMynetaRecordStatuses,
@@ -21,10 +22,18 @@ import {
   sumMynetaRecordStatusCounts,
 } from "./lib/myneta-records.mjs";
 
+const cliFilters = parseArchiveCliArgs();
 const reviewedManifest = await loadElectionManifest();
-const elections = reviewedManifest.elections
-  .map((entry) => ({ ...entry, year: entry.year }))
-  .sort((left, right) => left.state.localeCompare(right.state) || left.year - right.year);
+const elections = filterManifestElections(
+  reviewedManifest.elections.map((entry) => ({ ...entry, year: entry.year })),
+  cliFilters,
+).sort((left, right) => left.state.localeCompare(right.state) || left.year - right.year);
+if (!elections.length) {
+  throw new Error("No elections matched the archive CLI filters");
+}
+const mergeIntoExistingIndex = Boolean(
+  cliFilters.onlyChamber || cliFilters.onlyState || cliFilters.onlyFolders.size,
+);
 const outputDir = "public/data/candidates";
 const profileCacheRoot = new URL("../work/myneta-profile-cache/", import.meta.url);
 const requestLimit = createLimiter(8);
@@ -238,31 +247,46 @@ await Promise.all(Array.from({ length: 4 }, async () => {
 }));
 
 archiveManifest.sort((left, right) => left.state.localeCompare(right.state) || left.electionYear - right.electionYear);
-const total = archiveManifest.reduce((sum, election) => sum + election.candidateCount, 0);
-const states = [...new Set(archiveManifest.map((election) => election.state))].sort();
+
+let existingIndex = null;
+if (mergeIntoExistingIndex && await exists(`${outputDir}/index.json`)) {
+  existingIndex = JSON.parse(await readFile(`${outputDir}/index.json`, "utf8"));
+}
+
+const replacedFolders = new Set(archiveManifest.map((election) => election.electionFolder.toLowerCase()));
+const retainedElections = (existingIndex?.states ?? [])
+  .flatMap((state) => state.elections)
+  .filter((election) => !replacedFolders.has(election.electionFolder.toLowerCase()));
+const combinedManifest = [...retainedElections, ...archiveManifest]
+  .sort((left, right) => left.state.localeCompare(right.state) || left.electionYear - right.electionYear);
+
+const total = combinedManifest.reduce((sum, election) => sum + election.candidateCount, 0);
+const states = [...new Set(combinedManifest.map((election) => election.state))].sort();
 const index = {
   meta: {
-    title: "India state assembly candidate-affidavit archive",
+    title: mergeIntoExistingIndex && existingIndex?.meta?.title
+      ? existingIndex.meta.title.replace("state assembly", "assembly and Lok Sabha")
+      : "India state assembly candidate-affidavit archive",
     source: "Association for Democratic Reforms / MyNeta",
     retrievedAt: new Date().toISOString(),
     parserVersion: ARCHIVE_PARSER_VERSION,
     manifestSchemaVersion: reviewedManifest.schemaVersion,
     manifestReviewedAt: reviewedManifest.review.reviewedAt,
-    electionFolders: archiveManifest.length,
-    completeElectionFolders: archiveManifest.filter((election) => election.sourceRowsComplete).length,
+    electionFolders: combinedManifest.length,
+    completeElectionFolders: combinedManifest.filter((election) => election.sourceRowsComplete).length,
     candidateRecords: total,
-    byElectionRecords: archiveManifest.reduce((sum, election) => sum + election.byElectionRecords, 0),
-    moneyStatusCounts: sumMynetaRecordStatusCounts(archiveManifest.map((election) => election.moneyStatusCounts)),
-    profileEnrichmentTargets: archiveManifest.reduce((sum, election) => sum + election.profileEnrichmentTargets, 0),
-    profileEnrichmentComplete: archiveManifest.every((election) => election.profileEnrichmentComplete),
+    byElectionRecords: combinedManifest.reduce((sum, election) => sum + (election.byElectionRecords ?? 0), 0),
+    moneyStatusCounts: sumMynetaRecordStatusCounts(combinedManifest.map((election) => election.moneyStatusCounts)),
+    profileEnrichmentTargets: combinedManifest.reduce((sum, election) => sum + (election.profileEnrichmentTargets ?? 0), 0),
+    profileEnrichmentComplete: combinedManifest.every((election) => election.profileEnrichmentComplete),
     states: states.length,
-    firstYear: Math.min(...archiveManifest.map((election) => election.firstRecordYear)),
-    latestYear: Math.max(...archiveManifest.map((election) => election.latestRecordYear)),
+    firstYear: Math.min(...combinedManifest.map((election) => election.firstRecordYear)),
+    latestYear: Math.max(...combinedManifest.map((election) => election.latestRecordYear)),
     note: "Records are imported from the reviewed election manifest and MyNeta candidate summaries. JavaScript-obfuscated rows are decoded without executing source scripts. Masked or missing summary amounts are checked against the candidate's published Assets and Liabilities rows; definitive source unavailability remains null rather than becoming zero. Election shards load on demand.",
   },
   states: states.map((state) => ({
     state,
-    elections: archiveManifest
+    elections: combinedManifest
       .filter((election) => election.state === state)
       .sort((left, right) => right.electionYear - left.electionYear),
   })),
