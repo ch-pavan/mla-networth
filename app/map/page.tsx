@@ -204,9 +204,8 @@ export default function MapPage() {
             <span className="brandMark">न</span><span>NETA<strong>WORTH</strong></span>
           </Link>
           <nav aria-label="Primary">
-            <Link href="/">Database</Link>
+            <Link href="/">Home</Link>
             <Link href="/map" aria-current="page">Map</Link>
-            <Link href="/about">About</Link>
           </nav>
         </header>
 

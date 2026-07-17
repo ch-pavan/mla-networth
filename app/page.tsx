@@ -292,10 +292,9 @@ export default function Home() {
     </header>
 
     <section id="top" className="hero">
-      <div className="eyebrow"><span>THE PUBLIC LEDGER</span><span>Updated from election affidavits</span></div>
       <div className="chamberSwitch" role="tablist" aria-label="House">
         <button type="button" role="tab" aria-selected={chamber==="all"} className={chamber==="all"?"active":""} onClick={()=>switchChamber("all")}>All India</button>
-        <button type="button" role="tab" aria-selected={chamber==="assembly"} className={chamber==="assembly"?"active":""} onClick={()=>switchChamber("assembly")}>State assemblies</button>
+        <button type="button" role="tab" aria-selected={chamber==="assembly"} className={chamber==="assembly"?"active":""} onClick={()=>switchChamber("assembly")}>Assemblies</button>
         <button type="button" role="tab" aria-selected={chamber==="lok_sabha"} className={chamber==="lok_sabha"?"active":""} onClick={()=>switchChamber("lok_sabha")}>Lok Sabha</button>
         <button type="button" role="tab" aria-selected={chamber==="rajya_sabha"} className={chamber==="rajya_sabha"?"active":""} onClick={()=>switchChamber("rajya_sabha")}>Rajya Sabha</button>
       </div>
