@@ -5,6 +5,7 @@ import "./data-parsers.test.mjs";
 import "./format-money.test.mjs";
 import "./import-affidavits.test.mjs";
 import "./profile-history.test.mjs";
+import "./winner-history.test.mjs";
 
 test("ships the NetaWorth product experience", async () => {
   const [page, layout] = await Promise.all([
@@ -33,6 +34,9 @@ test("ships source links and appropriate data caveats", async () => {
   assert.match(page, /not independently audited market wealth/);
   assert.match(page, /snapshot\?\.meta\.recordCount\?\?4092/);
   assert.match(page, /archive\?\.meta\.winnerRecords\?\?15594/);
+  assert.match(page, /MyNeta-analyzed records imported from discovered election folders/);
+  assert.match(page, /ambiguous same-label winner groups are omitted/);
+  assert.doesNotMatch(page, /COMPLETE DATABASE|Every candidate affidavit|ELECTIONS COMPLETE|One seat\. Every election|every source page decoded/i);
 });
 
 test("ships the complete ADR 2025 sitting-MLA appendix", async () => {
