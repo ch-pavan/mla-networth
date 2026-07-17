@@ -34,9 +34,11 @@ async function fetchElection([state,currentYear,folder]){
     if(!partyMatch) continue;
     const href=(cells[1].match(/href=(?:["']?)([^\s"'>]+)/i)?.[1]??url).replaceAll("&amp;","&");
     const previousFolder=href.match(/[?&]myneta_folder2=([^&]+)/i)?.[1]??null;
+    const currentAssets=money(cells[2]);
+    const previousAssets=money(cells[3]);
     comparisons.push({
       state,currentYear,previousYear,rank:Number(decode(cells[0])),name:partyMatch[1].trim(),normalizedName:normalize(partyMatch[1]),
-      party:partyMatch[2].trim(),currentAssets:money(cells[2]),previousAssets:money(cells[3]),assetChange:money(cells[4]),
+      party:partyMatch[2].trim(),currentAssets,previousAssets,assetChange:currentAssets-previousAssets,
       percentChange:Number((decode(cells[5]).match(/-?[0-9.]+/)??[0])[0]),remarks:decode(cells[6]??""),comparisonUrl:href,previousFolder,
     });
   }

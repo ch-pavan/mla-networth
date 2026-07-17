@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import "./data-parsers.test.mjs";
 import "./profile-history.test.mjs";
 
 test("ships the NetaWorth product experience", async () => {
@@ -49,6 +50,7 @@ test("ships national two-election wealth comparisons", async () => {
   assert.deepEqual([history.meta.firstYear, history.meta.latestYear], [2004, 2025]);
   assert.ok(history.comparisons.every((row) => row.previousYear < row.currentYear));
   assert.ok(history.comparisons.every((row) => row.currentAssets >= 0 && row.previousAssets >= 0));
+  assert.ok(history.comparisons.every((row) => row.assetChange === row.currentAssets - row.previousAssets));
   assert.ok(history.comparisons.every((row) => row.comparisonUrl.startsWith("https://www.myneta.info/")));
 });
 
@@ -56,11 +58,14 @@ test("ships the historical constituency-winner archive", async () => {
   const archive = JSON.parse(await readFile(new URL("../public/data/adr-winner-archive.json", import.meta.url), "utf8"));
   assert.equal(archive.meta.electionFolders, 121);
   assert.equal(archive.meta.electionsWithWinners, 121);
-  assert.equal(archive.meta.winnerRecords, 13916);
-  assert.equal(archive.records.length, 13916);
+  assert.equal(archive.meta.parserVersion, 2);
+  assert.equal(archive.meta.completeElectionFolders, 121);
+  assert.equal(archive.meta.winnerRecords, 15594);
+  assert.equal(archive.records.length, archive.meta.winnerRecords);
   assert.equal(archive.meta.states, 31);
   assert.deepEqual([archive.meta.firstYear, archive.meta.latestYear], [2004, 2025]);
-  assert.equal(new Set(archive.records.map((row) => `${row.electionFolder}|${row.candidateId}`)).size, 13916);
+  assert.equal(new Set(archive.records.map((row) => `${row.electionFolder}|${row.candidateId}`)).size, archive.meta.winnerRecords);
+  assert.ok(archive.coverage.every((election) => election.complete && election.winnerCount === election.expectedFromOrdinals));
   assert.ok(archive.records.every((row) => row.name && row.constituency && row.candidateUrl.startsWith("https://www.myneta.info/")));
 });
 

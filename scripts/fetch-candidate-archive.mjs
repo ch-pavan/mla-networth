@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile, access } from "node:fs/promises";
-import vm from "node:vm";
+import { deobfuscateMynetaHtml } from "./lib/myneta-html.mjs";
 
 const history=JSON.parse(await readFile("public/data/adr-recontest-history.json","utf8"));
 const elections=[...new Map(history.elections.map(e=>[e.folder.toLowerCase(),{state:e.state,year:e.currentYear,folder:e.folder}])).values()].sort((a,b)=>a.state.localeCompare(b.state)||a.year-b.year);
@@ -23,15 +23,8 @@ async function get(task,attempt=1){
   }catch(error){if(attempt>=3)throw error;await sleep(attempt*1000);return get(task,attempt+1)}
 }
 async function batches(tasks,size=8){const out=[];for(let i=0;i<tasks.length;i+=size)out.push(...await Promise.all(tasks.slice(i,i+size).map(t=>get(t))));return out}
-function deobfuscate(html){
-  return html.replace(/<script>([\s\S]*?)<\/script>/gi,(all,code)=>{
-    if(!code.includes("eval(function"))return all;
-    let output="";
-    try{vm.runInNewContext(code,{document:{write:value=>output+=String(value)},console:{log(){}}},{timeout:1000});return output||all}catch{return all}
-  });
-}
 function parsePage(page){
-  const rows=[],html=deobfuscate(page.html);
+  const rows=[],html=deobfuscateMynetaHtml(page.html);
   for(const match of html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)){
     const cells=[...match[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)].map(m=>m[1]);
     if(cells.length<8||!/^\d+$/.test(decode(cells[0])))continue;
