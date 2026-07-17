@@ -1,6 +1,6 @@
 # NetaWorth
 
-Public ledger of wealth declared by India’s elected representatives — sitting MLAs, winners, and candidates across state assembly elections (2004–2025).
+Public ledger of wealth declared by India’s elected representatives — sitting MLAs, winners, and candidates from reviewed state-assembly election sources.
 
 Data comes from election affidavits (ECI / ADR / MyNeta). Figures are self-declared, not independently audited market wealth.
 
@@ -20,16 +20,18 @@ The development server prints its local URL. The application does not require a 
 
 ## Architecture
 
-The shipped product is a client-rendered Next.js App Router application built with [vinext](https://github.com/cloudflare/vinext) for Cloudflare Workers. Its live data source is generated, versioned JSON under `public/data/`:
+The shipped product is a client-rendered Next.js App Router application built with [vinext](https://github.com/cloudflare/vinext). Its live data source is generated, versioned JSON under `public/data/`:
 
 - `adr-sitting-mlas-2025.json` is the current nationwide sitting-MLA snapshot.
 - `adr-recontest-history.json` contains attributed affidavit-to-affidavit comparisons.
 - `adr-winner-archive.json` contains constituency winner records.
 - `candidates/index.json` and the election shards beside it contain the candidate archive.
 
+`data/election-manifest.json` is the reviewed source-coverage input for the candidate, winner, and recontest generators. It contains 135 included MyNeta election folders: 121 represented in the local candidate archive at review time and 14 additional public folders verified during review. One folder is explicitly excluded because the required analyzed-summary pages were unavailable. These counts describe reviewed and imported MyNeta source coverage, not an exhaustive census of every election conducted by the ECI.
+
 The browser reads these files directly. Changes to `db/`, `drizzle/`, or `app/api/` do not change the public UI unless the UI is explicitly migrated to those endpoints.
 
-### D1 status
+### Optional D1 status
 
 Cloudflare D1 and Drizzle are an unfinished, optional path. The schema, migration, importer, and read APIs are present for development, but the repository does not contain a production database ID, a production binding, seeded production data, or a completed UI integration. The UUID in `vite.config.ts` is a local placeholder. Do not treat the D1 routes as production-ready or deploy them against a real database without an explicit migration and data-review plan.
 
@@ -63,16 +65,20 @@ The sitting-MLA snapshot starts from a locally reviewed ADR PDF. The extractor r
 python3 scripts/extract-adr-report.py <path-to-reviewed-report.pdf> public/data/adr-sitting-mlas-2025.json
 ```
 
-Refresh the dependent MyNeta datasets in this order because the winner and candidate scripts discover elections from the history snapshot:
+The candidate and winner archives do not discover elections from recontest history. All three generators load the reviewed election manifest directly. Run candidates before winners because winner amounts are cross-checked against the regenerated candidate shards; the history refresh is otherwise independent:
 
 ```bash
-npm run data:history
-npm run data:winners
 npm run data:candidates
+npm run data:winners
+npm run data:history
 npm run verify
 ```
 
-These commands make network requests to third-party source sites and can produce large diffs. Check record counts, coverage flags, retrieval timestamps, source hashes, spot samples, and all test failures before committing. `data:candidates` intentionally reuses existing parser-version-3 shards; it is not a guaranteed full refetch of cached elections. A full archive refresh therefore requires a deliberate cache-invalidation change and additional review, not an ad hoc deletion during routine maintenance.
+These commands make network requests to third-party source sites and can produce large diffs. Check record counts, source-row coverage flags, retrieval timestamps, source hashes, money-status totals, by-election totals, spot samples, and all test failures before committing. The generators decode only the recognized MyNeta packed-row format and never execute source JavaScript. Unknown packed scripts and non-contiguous source ranks fail generation instead of silently dropping rows.
+
+Candidate summary amounts use explicit `parsed`, `nil`, `masked`, and `missing` statuses. Only `nil` means the source explicitly declared no amount; masked and missing values remain `null`, not zero. The candidate generator checks masked or missing summary amounts against the candidate profile and writes successful or definitive unavailable lookups to resumable, atomic checkpoints under the ignored `work/myneta-profile-cache/` directory. The winner generator then reconciles each winner against the candidate archive and fails on conflicting positive amounts.
+
+By-election suffixes are parsed at the record level. A by-election record therefore carries its own election date, year, type, and base constituency even when it appears inside a general-election source folder.
 
 The optional normalized-file-to-SQL importer writes a seed file and rejection report; it does not apply a migration or alter a remote database:
 
@@ -80,20 +86,7 @@ The optional normalized-file-to-SQL importer writes a seed file and rejection re
 npm run data:import -- <normalized.csv-or-json> <output-seed.sql>
 ```
 
-Never commit downloaded source documents unless their licensing and repository size have been reviewed. Never commit Cloudflare credentials or local environment files.
-
-## Deployment runbook
-
-This repository deliberately does not encode an owner’s Cloudflare account, production project, resource IDs, secrets, domain, or release credentials. Before the first deployment, the repository owner must:
-
-1. Choose and document the Cloudflare Worker/project and domain outside source control.
-2. Decide whether the release is the current static-JSON product or includes D1. For the static product, do not expose the unfinished D1 APIs as an operational dependency. For D1, replace the placeholder with an approved production binding and separately review migrations, seed data, backup, and rollback.
-3. Configure deployment credentials in the CI/CD or operator environment, never in tracked files.
-4. Run `npm ci && npm run verify` and review the generated production build.
-5. Deploy through the owner-approved Cloudflare workflow. There is intentionally no `deploy` package script until the production project and binding configuration are defined.
-6. Smoke-test `/`, a sitting-MLA profile, a candidate profile, and representative files under `/data/`. Confirm source links, record counts, search, filtering, and error responses.
-
-For a static-data rollback, redeploy the last known-good commit and verify its matching versioned JSON. If a future release changes D1, database rollback and compatibility must be planned independently; reverting application code alone may not reverse data changes.
+Never commit downloaded source documents unless their licensing and repository size have been reviewed. Never commit Cloudflare credentials or local environment files. Deployment is outside the scope of the current release; the repository intentionally has no production deployment configuration or `deploy` package script.
 
 ## Scripts
 
