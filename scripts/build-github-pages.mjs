@@ -69,6 +69,10 @@ const requiredFiles = [
   "data/lok-sabha-winner-archive.json",
   "data/rajya-sabha-sitting-mps.json",
   "data/candidates/index.json",
+  "data/geo/india-states.json",
+  "data/geo/pc-index.json",
+  "data/geo/pc-match-index.json",
+  "data/geo/pc/india.json",
   "favicon.svg",
   "og.png",
 ];

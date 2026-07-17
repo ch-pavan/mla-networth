@@ -23,7 +23,8 @@
     "data:loksabha:quick": "node scripts/fetch-winner-archive.mjs --chamber=lok_sabha --summary-money && node scripts/build-lok-sabha-sitting-mps.mjs",
     "data:loksabha:mps": "node scripts/build-lok-sabha-sitting-mps.mjs",
     "data:rajyasabha": ".venv-adr/bin/python scripts/extract-adr-rajya-sabha.py work/adr-pdfs/sitting-rajya-sabha-march-2026.pdf public/data/rajya-sabha-sitting-mps.json",
-    "data:match-geo": "node scripts/match-constituencies.mjs"
+    "data:match-geo": "node scripts/match-constituencies.mjs",
+    "data:match-pc-geo": "node scripts/match-pc-constituencies.mjs"
   },
   "dependencies": {
     "d3-geo": "^3.1.1",

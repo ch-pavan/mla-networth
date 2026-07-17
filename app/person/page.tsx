@@ -61,6 +61,28 @@ export default function PersonPage(){
       }
 
       const rank=Number(params.get("rank"));
+      const chamber=params.get("chamber")||"assembly";
+      if(chamber==="lok_sabha"){
+        const snapshot=await fetchJson<{meta:{sourceUrl:string};records:(Current&{electionFolder?:string;candidateId?:number;candidateUrl?:string;electionYear?:number})[]}>(publicUrl("/data/lok-sabha-sitting-mps.json"),controller.signal);
+        const person=snapshot.records.find(r=>r.rank===rank);
+        if(!person)throw new Error("Lok Sabha record not found");
+        if(person.electionFolder&&person.candidateId){
+          window.location.replace(publicUrl(`/person?type=candidate&election=${encodeURIComponent(person.electionFolder)}&id=${person.candidateId}`));
+          return;
+        }
+        setProfile({kind:"current",name:person.name,state:person.state,year:person.electionYear||2024,constituency:person.constituency,party:person.party,assets:person.assets,liabilities:person.liabilities,criminalCases:person.criminalCases,education:person.education,sourceUrl:person.candidateUrl||snapshot.meta.sourceUrl,age:person.age,gender:person.gender,seriousCases:person.seriousCriminalCases,panDeclared:person.panDeclared,recordId:`LS-${person.rank}`});
+        setHistory([{year:person.electionYear||2024,assets:person.assets,sourceUrl:person.candidateUrl||snapshot.meta.sourceUrl}]);
+        return;
+      }
+      if(chamber==="rajya_sabha"){
+        const snapshot=await fetchJson<{meta:{sourceUrl:string};records:(Current&{electionYear?:number|null})[]}>(publicUrl("/data/rajya-sabha-sitting-mps.json"),controller.signal);
+        const person=snapshot.records.find(r=>r.rank===rank);
+        if(!person)throw new Error("Rajya Sabha record not found");
+        const year=person.electionYear||2026;
+        setProfile({kind:"current",name:person.name,state:person.state,year,constituency:person.constituency||"Rajya Sabha",party:person.party,assets:person.assets,liabilities:person.liabilities,criminalCases:person.criminalCases,education:person.education,sourceUrl:snapshot.meta.sourceUrl,age:person.age,gender:person.gender,seriousCases:person.seriousCriminalCases,panDeclared:person.panDeclared,recordId:`RS-${person.rank}`});
+        setHistory([{year,assets:person.assets,sourceUrl:snapshot.meta.sourceUrl}]);
+        return;
+      }
       const [snapshot,comparisons]=await Promise.all([
         fetchJson<{records:Current[]}>(publicUrl("/data/adr-sitting-mlas-2025.json"),controller.signal),
         fetchJson<{comparisons:AssetComparison[]}>(publicUrl("/data/adr-recontest-history.json"),controller.signal),
@@ -87,7 +109,7 @@ export default function PersonPage(){
     {profile&&<>
       <section className="personHero">
         <div className="personCrumb">PUBLIC RECORD / {profile.state.toUpperCase()} / {profile.year}</div>
-        <div className="personHeroGrid"><div className="personMonogram">{initials(profile.name)}</div><div><span className="recordType">{profile.kind==="current"?"SITTING MLA PROFILE":"CANDIDATE AFFIDAVIT PROFILE"}</span><h1>{profile.name}</h1><p><b>{profile.party}</b> · {profile.constituency}, {profile.state}</p></div><div className="personNet"><small>ASSETS LESS LIABILITIES</small><b>{money(netWorth)}</b><span>{netWorth===null?"Requires both declared values":"Based on declared values"}</span></div></div>
+        <div className="personHeroGrid"><div className="personMonogram">{initials(profile.name)}</div><div><span className="recordType">{profile.kind==="current"?(profile.recordId.startsWith("LS")?"SITTING LOK SABHA PROFILE":profile.recordId.startsWith("RS")?"SITTING RAJYA SABHA PROFILE":"SITTING MLA PROFILE"):"CANDIDATE AFFIDAVIT PROFILE"}</span><h1>{profile.name}</h1><p><b>{profile.party}</b> · {profile.constituency}, {profile.state}</p></div><div className="personNet"><small>ASSETS LESS LIABILITIES</small><b>{money(netWorth)}</b><span>{netWorth===null?"Requires both declared values":"Based on declared values"}</span></div></div>
       </section>
       <section className="personContent">
         <div className="personMain">

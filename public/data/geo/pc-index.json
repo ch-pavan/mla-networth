@@ -1,0 +1,10 @@
+{
+  "meta": {
+    "source": "DataMeet parliamentary-constituencies / india_pc_2019_simplified (CC0)",
+    "file": "pc/india.json",
+    "objectName": "india_pc_2019_simplified",
+    "featureCount": 543,
+    "nameProperty": "pc_name",
+    "stateProperty": "st_name"
+  }
+}

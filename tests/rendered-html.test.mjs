@@ -18,6 +18,8 @@ test("ships the NetaWorth product experience", async () => {
   ]);
   assert.match(layout, /NetaWorth — Follow the money\. Know your neta\./i);
   assert.match(page, /India&apos;s most ambitious public record/);
+  assert.match(page, /switchChamber\("all"\)/);
+  assert.match(page, /All India/);
   assert.match(page, /The wealth table/);
   assert.match(page, /Declared assets over time/);
   assert.match(page, /State of wealth/);
@@ -31,11 +33,14 @@ test("ships the NetaWorth product experience", async () => {
 });
 
 test("ships source links and appropriate data caveats", async () => {
-  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const [page, about] = await Promise.all([
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/about/page.tsx", import.meta.url), "utf8"),
+  ]);
   assert.match(page, /https:\/\/affidavit\.eci\.gov\.in\//);
   assert.match(page, /https:\/\/www\.myneta\.info\//);
-  assert.match(page, /self-sworn election affidavit/);
-  assert.match(page, /not independently audited market wealth/);
+  assert.match(about, /self-sworn election affidavit/);
+  assert.match(about, /not an independently audited estimate of market wealth/);
   assert.match(page, /snapshot\?\.meta\.recordCount\?\?4092/);
   assert.match(page, /archive\?\.meta\.winnerRecords\?\?17785/);
   assert.match(page, /MyNeta-analyzed records imported from discovered election folders/);
@@ -99,17 +104,18 @@ test("ships the complete sharded candidate-affidavit archive", async () => {
   const index = JSON.parse(await readFile(new URL("../public/data/candidates/index.json", import.meta.url), "utf8"));
   const elections = index.states.flatMap((state) => state.elections);
   assert.equal(index.meta.parserVersion, 5);
-  assert.equal(index.meta.electionFolders, 135);
-  assert.equal(index.meta.completeElectionFolders, 135);
-  assert.equal(index.meta.candidateRecords, 172969);
-  assert.equal(index.meta.states, 31);
+  assert.equal(index.meta.electionFolders, 136);
+  assert.equal(index.meta.completeElectionFolders, 136);
+  assert.equal(index.meta.candidateRecords, 181307);
+  assert.equal(index.meta.states, 32);
   assert.deepEqual([index.meta.firstYear, index.meta.latestYear], [2004, 2026]);
   assert.equal(index.meta.byElectionRecords, 186);
-  assert.equal(index.meta.profileEnrichmentTargets, 19156);
+  assert.equal(index.meta.profileEnrichmentTargets, 20082);
   assert.equal(index.meta.profileEnrichmentComplete, true);
-  assert.equal(elections.length, 135);
+  assert.equal(elections.length, 136);
   assert.ok(elections.every((election) => election.sourceRowsComplete && election.profileEnrichmentComplete && election.candidateCount === election.expectedFromOrdinals));
-  assert.equal(elections.reduce((sum, election) => sum + election.candidateCount, 0), 172969);
+  assert.equal(elections.reduce((sum, election) => sum + election.candidateCount, 0), 181307);
+  assert.ok(index.states.some((state) => state.state === "Lok Sabha"));
 });
 
 test("opens people on a dedicated internal profile route", async () => {
@@ -117,12 +123,12 @@ test("opens people on a dedicated internal profile route", async () => {
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/person/page.tsx", import.meta.url), "utf8"),
   ]);
-  assert.match(home, /\/person\?type=current&rank=/);
+  assert.match(home, /\/person\?type=current&chamber=assembly&rank=/);
   assert.match(home, /\/person\?type=candidate&election=/);
   assert.match(person, /CANDIDATE AFFIDAVIT PROFILE/);
   assert.match(person, /SITTING MLA PROFILE/);
   assert.match(person, /Declared assets over time/);
-  assert.match(person, /Back to database/);
+  assert.match(person, /Return to NetaWorth|Database/);
   assert.match(person, /buildVerifiedAssetHistory/);
   assert.match(person, /Only the selected candidate affidavit is shown/);
   assert.doesNotMatch(person, /Promise\.all\(elections\.map/);
