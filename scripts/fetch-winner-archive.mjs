@@ -2,11 +2,15 @@
 import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { deobfuscateMynetaHtml } from "./lib/myneta-html.mjs";
+import {
+  countMynetaRecordStatuses,
+  decodeMynetaCell,
+  parseMynetaConstituencyLabel,
+  parseMynetaMoneyCell,
+} from "./lib/myneta-records.mjs";
 
 const history=JSON.parse(await readFile("public/data/adr-recontest-history.json","utf8"));
 const elections=[...new Map(history.elections.map(e=>[e.folder.toLowerCase(),{state:e.state,year:e.currentYear,folder:e.folder}])).values()].sort((a,b)=>a.state.localeCompare(b.state)||a.year-b.year);
-const decode=(s)=>s.replace(/<br\s*\/?\s*>/gi," ").replace(/<[^>]+>/g," ").replaceAll("&nbsp;"," ").replaceAll("&amp;","&").replaceAll("&#039;","'").replaceAll("&quot;",'"').replace(/\s+/g," ").trim();
-const money=(s)=>{const plain=decode(s);const m=plain.match(/(?:Rs\s*)?([0-9][0-9,]*)/i);return m?Number(m[1].replaceAll(",","")):0};
 const normalize=(s)=>s.normalize("NFKD").replace(/[.']/g,"").replace(/[^a-zA-Z0-9]+/g," ").trim().toLowerCase();
 const urlFor=(folder,page)=>`https://www.myneta.info/${folder}/index.php?action=summary&page=${page}&sort=asset&subAction=winner_analyzed`;
 
@@ -29,10 +33,13 @@ function parsePage(page){
   const rows=[],html=deobfuscateMynetaHtml(page.html);
   for(const match of html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)){
     const cells=[...match[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)].map(m=>m[1]);
-    if(cells.length<8||!/^\d+$/.test(decode(cells[0])))continue;
-    const candidateId=Number(cells[1].match(/candidate_id=(\d+)/i)?.[1]??0); const name=decode(cells[1]);
+    if(cells.length<8||!/^\d+$/.test(decodeMynetaCell(cells[0])))continue;
+    const candidateId=Number(cells[1].match(/candidate_id=(\d+)/i)?.[1]??0); const name=decodeMynetaCell(cells[1]);
     if(!candidateId||!name)continue;
-    rows.push({state:page.state,electionYear:page.year,electionFolder:page.folder,rankByAssets:Number(decode(cells[0])),candidateId,name,normalizedName:normalize(name),constituency:decode(cells[2]),normalizedConstituency:normalize(decode(cells[2])),party:decode(cells[3]),criminalCases:Number((decode(cells[4]).match(/\d+/)??[0])[0]),education:decode(cells[5]),assets:money(cells[6]),liabilities:money(cells[7]),candidateUrl:`https://www.myneta.info/${page.folder}/candidate.php?candidate_id=${candidateId}`});
+    const constituency=decodeMynetaCell(cells[2]);
+    const constituencyDetails=parseMynetaConstituencyLabel(constituency,page.year);
+    const assets=parseMynetaMoneyCell(cells[6]),liabilities=parseMynetaMoneyCell(cells[7]);
+    rows.push({state:page.state,electionYear:constituencyDetails.electionYear,electionDate:constituencyDetails.electionDate,electionType:constituencyDetails.electionType,electionFolder:page.folder,rankByAssets:Number(decodeMynetaCell(cells[0])),candidateId,name,normalizedName:normalize(name),constituency,baseConstituency:constituencyDetails.baseConstituency,normalizedConstituency:normalize(constituencyDetails.baseConstituency),party:decodeMynetaCell(cells[3]),criminalCases:Number((decodeMynetaCell(cells[4]).match(/\d+/)??[0])[0]),education:decodeMynetaCell(cells[5]),assets:assets.value,assetsStatus:assets.status,liabilities:liabilities.value,liabilitiesStatus:liabilities.status,candidateUrl:`https://www.myneta.info/${page.folder}/candidate.php?candidate_id=${candidateId}`});
   }
   return rows;
 }
@@ -57,6 +64,6 @@ const coverage=elections.map(e=>{
 const incomplete=coverage.filter(e=>!e.complete);
 if(incomplete.length)throw new Error(`Refusing to write an incomplete winner archive: ${incomplete.map(e=>`${e.folder} (${e.winnerCount}/${e.expectedFromOrdinals})`).join(", ")}`);
 const years=records.map(r=>r.electionYear);
-const payload={meta:{title:"India state assembly winner archive",source:"Association for Democratic Reforms / MyNeta",retrievedAt:new Date().toISOString(),parserVersion:2,electionFolders:elections.length,electionsWithWinners:coverage.filter(e=>e.winnerCount).length,completeElectionFolders:coverage.filter(e=>e.complete).length,winnerRecords:records.length,states:new Set(records.map(r=>r.state)).size,firstYear:Math.min(...years),latestYear:Math.max(...years),note:"Winner records are taken from MyNeta election summaries derived from candidate affidavits. JavaScript-obfuscated rows are decoded in an isolated VM. Constituency names are retained as published for each election."},coverage,records};
+const payload={meta:{title:"India state assembly winner archive",source:"Association for Democratic Reforms / MyNeta",retrievedAt:new Date().toISOString(),parserVersion:3,electionFolders:elections.length,electionsWithWinners:coverage.filter(e=>e.winnerCount).length,completeElectionFolders:coverage.filter(e=>e.complete).length,winnerRecords:records.length,byElectionRecords:records.filter(r=>r.electionType==="by-election").length,moneyStatusCounts:countMynetaRecordStatuses(records),states:new Set(records.map(r=>r.state)).size,firstYear:Math.min(...years),latestYear:Math.max(...years),note:"Winner records are taken from MyNeta election summaries derived from candidate affidavits. JavaScript-obfuscated rows are decoded without executing source scripts. Record-level by-election details are parsed from published constituency labels. Unavailable monetary values remain null with an explicit status instead of being treated as zero."},coverage,records};
 await writeFile("public/data/adr-winner-archive.json",JSON.stringify(payload)+"\n");
 console.log(JSON.stringify(payload.meta,null,2));
