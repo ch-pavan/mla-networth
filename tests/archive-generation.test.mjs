@@ -77,7 +77,7 @@ test("profile enrichment preserves known summaries and resolves unknown fields",
   );
 });
 
-test("winner money uses the candidate archive and rejects definitive conflicts", () => {
+test("winner money uses the candidate archive and records definitive source conflicts", () => {
   const winner = {
     electionFolder: "ap09",
     candidateId: 138,
@@ -102,20 +102,21 @@ test("winner money uses the candidate archive and rejects definitive conflicts",
     liabilitiesSource: "candidate-archive",
   });
 
-  assert.throws(
-    () => reconcileWinnerMoney(
-      { ...winner, assets: 7, assetsStatus: "parsed" },
-      { ...candidate, assets: 8 },
-    ),
-    /Conflicting definitive assets/,
+  const conflict = reconcileWinnerMoney(
+    { ...winner, assets: 7, assetsStatus: "parsed" },
+    { ...candidate, assets: 8, assetsSource: "candidate-profile" },
   );
-  assert.throws(
-    () => reconcileWinnerMoney(
-      { ...winner, assets: 0, assetsStatus: "nil" },
-      { ...candidate, assets: 8 },
-    ),
-    /Conflicting definitive assets/,
+  assert.equal(conflict.assets, 8);
+  assert.deepEqual(conflict.moneyConflicts.assets, {
+    winnerSummary: { value: 7, status: "parsed" },
+    candidateArchive: { value: 8, status: "parsed", source: "candidate-profile" },
+  });
+
+  const zeroConflict = reconcileWinnerMoney(
+    { ...winner, assets: 0, assetsStatus: "nil" },
+    { ...candidate, assets: 8 },
   );
+  assert.equal(zeroConflict.moneyConflicts.assets.winnerSummary.value, 0);
   assert.throws(() => reconcileWinnerMoney(winner, null), /missing from the candidate archive/);
 });
 

@@ -156,13 +156,19 @@ export function reconcileWinnerMoney(winner, candidate) {
   }
 
   const next = { ...winner };
+  const moneyConflicts = {};
   for (const field of MONEY_FIELDS) {
     const winnerValue = winner[field];
     const candidateValue = candidate[field];
     if (winnerValue !== null && candidateValue !== null && winnerValue !== candidateValue) {
-      throw new Error(
-        `Conflicting definitive ${field} for ${winner.electionFolder}/${winner.candidateId}: winner summary ${winnerValue}, candidate archive ${candidateValue}`,
-      );
+      moneyConflicts[field] = {
+        winnerSummary: { value: winnerValue, status: winner[`${field}Status`] },
+        candidateArchive: {
+          value: candidateValue,
+          status: candidate[`${field}Status`],
+          source: candidate[`${field}Source`] ?? "candidate-archive",
+        },
+      };
     }
 
     if (candidateValue !== null) {
@@ -173,6 +179,7 @@ export function reconcileWinnerMoney(winner, candidate) {
       next[`${field}Source`] = winner[`${field}Source`] ?? "winner-summary";
     }
   }
+  if (Object.keys(moneyConflicts).length) next.moneyConflicts = moneyConflicts;
   return next;
 }
 

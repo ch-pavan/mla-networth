@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import "./archive-generation.test.mjs";
+import "./archive-integrity.test.mjs";
 import "./data-parsers.test.mjs";
+import "./election-manifest.test.mjs";
 import "./format-money.test.mjs";
 import "./import-affidavits.test.mjs";
 import "./profile-history.test.mjs";
@@ -33,7 +36,7 @@ test("ships source links and appropriate data caveats", async () => {
   assert.match(page, /self-sworn election affidavit/);
   assert.match(page, /not independently audited market wealth/);
   assert.match(page, /snapshot\?\.meta\.recordCount\?\?4092/);
-  assert.match(page, /archive\?\.meta\.winnerRecords\?\?15594/);
+  assert.match(page, /archive\?\.meta\.winnerRecords\?\?17785/);
   assert.match(page, /MyNeta-analyzed records imported from discovered election folders/);
   assert.match(page, /ambiguous same-label winner groups are omitted/);
   assert.doesNotMatch(page, /COMPLETE DATABASE|Every candidate affidavit|ELECTIONS COMPLETE|One seat\. Every election|every source page decoded/i);
@@ -75,14 +78,17 @@ test("ships national two-election wealth comparisons", async () => {
 
 test("ships the historical constituency-winner archive", async () => {
   const archive = JSON.parse(await readFile(new URL("../public/data/adr-winner-archive.json", import.meta.url), "utf8"));
-  assert.equal(archive.meta.electionFolders, 121);
-  assert.equal(archive.meta.electionsWithWinners, 121);
-  assert.equal(archive.meta.parserVersion, 2);
-  assert.equal(archive.meta.completeElectionFolders, 121);
-  assert.equal(archive.meta.winnerRecords, 15594);
+  assert.equal(archive.meta.electionFolders, 135);
+  assert.equal(archive.meta.electionsWithWinners, 135);
+  assert.equal(archive.meta.parserVersion, 5);
+  assert.equal(archive.meta.completeElectionFolders, 135);
+  assert.equal(archive.meta.winnerRecords, 17785);
   assert.equal(archive.records.length, archive.meta.winnerRecords);
   assert.equal(archive.meta.states, 31);
-  assert.deepEqual([archive.meta.firstYear, archive.meta.latestYear], [2004, 2025]);
+  assert.deepEqual([archive.meta.firstYear, archive.meta.latestYear], [2004, 2026]);
+  assert.equal(archive.meta.byElectionRecords, 29);
+  assert.equal(archive.meta.moneyConflictRecords, 152);
+  assert.equal(archive.meta.moneyConflictFields, 152);
   assert.equal(new Set(archive.records.map((row) => `${row.electionFolder}|${row.candidateId}`)).size, archive.meta.winnerRecords);
   assert.ok(archive.coverage.every((election) => election.complete && election.winnerCount === election.expectedFromOrdinals));
   assert.ok(archive.records.every((row) => row.name && row.constituency && row.candidateUrl.startsWith("https://www.myneta.info/")));
@@ -91,15 +97,18 @@ test("ships the historical constituency-winner archive", async () => {
 test("ships the complete sharded candidate-affidavit archive", async () => {
   const index = JSON.parse(await readFile(new URL("../public/data/candidates/index.json", import.meta.url), "utf8"));
   const elections = index.states.flatMap((state) => state.elections);
-  assert.equal(index.meta.parserVersion, 3);
-  assert.equal(index.meta.electionFolders, 121);
-  assert.equal(index.meta.completeElectionFolders, 121);
-  assert.equal(index.meta.candidateRecords, 153470);
+  assert.equal(index.meta.parserVersion, 5);
+  assert.equal(index.meta.electionFolders, 135);
+  assert.equal(index.meta.completeElectionFolders, 135);
+  assert.equal(index.meta.candidateRecords, 172969);
   assert.equal(index.meta.states, 31);
-  assert.deepEqual([index.meta.firstYear, index.meta.latestYear], [2004, 2025]);
-  assert.equal(elections.length, 121);
-  assert.ok(elections.every((election) => election.complete && election.candidateCount === election.expectedFromOrdinals));
-  assert.equal(elections.reduce((sum, election) => sum + election.candidateCount, 0), 153470);
+  assert.deepEqual([index.meta.firstYear, index.meta.latestYear], [2004, 2026]);
+  assert.equal(index.meta.byElectionRecords, 186);
+  assert.equal(index.meta.profileEnrichmentTargets, 19156);
+  assert.equal(index.meta.profileEnrichmentComplete, true);
+  assert.equal(elections.length, 135);
+  assert.ok(elections.every((election) => election.sourceRowsComplete && election.profileEnrichmentComplete && election.candidateCount === election.expectedFromOrdinals));
+  assert.equal(elections.reduce((sum, election) => sum + election.candidateCount, 0), 172969);
 });
 
 test("opens people on a dedicated internal profile route", async () => {

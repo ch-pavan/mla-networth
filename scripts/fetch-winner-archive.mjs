@@ -197,6 +197,7 @@ const coverage = elections.map((election) => {
     folder: election.folder,
     manifestAvailabilityAtReview: election.availability,
     winnerCount: subset.length,
+    moneyConflictRecords: subset.filter((record) => record.moneyConflicts).length,
     expectedFromOrdinals,
     sourceRowsComplete,
     complete: sourceRowsComplete,
@@ -213,6 +214,7 @@ if (incomplete.length) {
 }
 
 const years = records.map((record) => record.electionYear);
+const moneyConflictRecords = records.filter((record) => record.moneyConflicts);
 const payload = {
   meta: {
     title: "India state assembly winner archive",
@@ -227,11 +229,16 @@ const payload = {
     winnerRecords: records.length,
     byElectionRecords: records.filter((record) => record.electionType === "by-election").length,
     moneyStatusCounts: countMynetaRecordStatuses(records),
+    moneyConflictRecords: moneyConflictRecords.length,
+    moneyConflictFields: moneyConflictRecords.reduce(
+      (count, record) => count + Object.keys(record.moneyConflicts).length,
+      0,
+    ),
     candidateArchiveCrossCheckComplete: true,
     states: new Set(records.map((record) => record.state)).size,
     firstYear: Math.min(...years),
     latestYear: Math.max(...years),
-    note: "Winner records are imported from the reviewed election manifest and MyNeta winner summaries. Money is cross-checked against the regenerated candidate archive by election folder and candidate ID; candidate values are authoritative, and conflicting definitive amounts fail generation. Unavailable values remain null rather than becoming zero.",
+    note: "Winner records are imported from the reviewed election manifest and MyNeta winner summaries. Money is cross-checked against the regenerated candidate archive by election folder and candidate ID. Direct candidate-profile values are authoritative; any conflicting winner-summary amount is retained in moneyConflicts for review instead of silently overwriting either source. Unavailable values remain null rather than becoming zero.",
   },
   coverage,
   records,
