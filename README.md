@@ -57,7 +57,7 @@ CI runs on Node 22 for pushes to `main` and for pull requests.
 
 ## Deployment
 
-- Public GitHub Pages: `https://ch-pavan.github.io/mla-networth/`
+- GitHub Pages URL (available after repository activation): `https://ch-pavan.github.io/mla-networth/`
 - Private ChatGPT Sites: `https://netaworth-india.gamincon4112003.chatgpt.site/`
 
 Pushes to `main` run `.github/workflows/pages.yml`, which builds and publishes the static GitHub Pages edition. Run the same export locally with:
@@ -65,6 +65,8 @@ Pushes to `main` run `.github/workflows/pages.yml`, which builds and publishes t
 ```bash
 npm run build:pages
 ```
+
+For the first deployment, a repository administrator must open **Settings → Pages** and select **GitHub Actions** as the publishing source. After that one-time activation, pushes to `main` deploy automatically.
 
 The Pages build validates the `/mla-networth` project path, bundled data files, internal routes, and social metadata before producing `out/`. It intentionally excludes `app/api/` because GitHub Pages is a static host; the public UI continues to use the versioned JSON archive under `public/data/`. The normal `npm run build` command remains the vinext/ChatGPT Sites build.
 
