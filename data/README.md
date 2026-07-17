@@ -12,9 +12,13 @@ The public site treats every wealth figure as an attributed declaration, never a
 
 Required: `state`, `state_code`, `assembly_seats`, `constituency_no`, `constituency`, `year`, `candidate`, `party`, `winner`, `total_assets`, `liabilities`, `affidavit_url`.
 
-Optional: `party_name`, `reservation`, `election_type`, `age`, `votes`, `vote_share`, `margin`, `movable_assets`, `immovable_assets`, `declared_income`, `spouse_assets`, `dependents_assets`, `criminal_cases`, `serious_criminal_cases`, `education`, `profession`, `pan_declared`, `source_kind`, `source_url`, `verification_status`.
+Optional: `party_name`, `reservation`, `election_type`, `age`, `votes`, `vote_share`, `margin`, `movable_assets`, `immovable_assets`, `declared_income`, `spouse_assets`, `dependents_assets`, `criminal_cases`, `serious_criminal_cases`, `education`, `profession`, `pan_declared`, `source_kind`, `source_url`, `verification_status`, `reviewed_canonical_id`.
 
-All monetary values are integer rupees. Each row represents one candidate in one constituency in one election. Names are retained exactly as filed and linked to a canonical person record separately.
+All monetary values are integer rupees. Each row represents one candidate in one constituency in one election. Names are retained exactly as filed.
+
+The normalized importer creates a separate, stable person record for every candidacy by default, even when two rows contain the same candidate name. These records have identity confidence `0` and an explicit note that no cross-election identity review has occurred. This avoids inventing a relationship between namesakes or assuming that a repeated name identifies the same person.
+
+Cross-candidacy merging is opt-in only: rows may share a non-empty `reviewed_canonical_id` after a human has reviewed the source candidacies and confirmed that they identify the same person. The identifier is an internal durable key, not a name or a generated guess. Reviewed links receive identity confidence `0.9` plus a note naming the reviewed identifier. Changing or removing that identifier intentionally creates a different person identity on the next import.
 
 ## Verification levels
 
@@ -23,7 +27,7 @@ All monetary values are integer rupees. Each row represents one candidate in one
 - `reviewed`: identity and money fields manually checked.
 - `verified`: checked against the linked ECI affidavit.
 
-The importer rejects duplicate candidacies, negative monetary values, missing identity fields and non-HTTPS affidavit links. Every run records a SHA-256 source fingerprint and a rejection report.
+The importer rejects duplicate candidacies, missing or invalid required integers, non-positive seat/year values, negative monetary values, missing identity fields and non-HTTPS affidavit links. Required numeric values never silently fall back to `0` or `NULL`. Every run records a SHA-256 source fingerprint and a rejection report.
 
 ## Historical comparison snapshot
 

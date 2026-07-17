@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import "./data-parsers.test.mjs";
 import "./format-money.test.mjs";
+import "./import-affidavits.test.mjs";
 import "./profile-history.test.mjs";
 
 test("ships the NetaWorth product experience", async () => {

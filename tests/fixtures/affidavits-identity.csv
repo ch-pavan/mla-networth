@@ -1,0 +1,9 @@
+state,state_code,assembly_seats,constituency_no,constituency,year,candidate,party,winner,total_assets,liabilities,affidavit_url,source_url,reviewed_canonical_id
+Example Pradesh,EX,2,1,North Seat,2020,Alex Lee,IND,false,1000000,10000,https://example.gov/affidavit/ex-alex,https://example.gov/results,
+Example Pradesh,EX,2,1,North Seat,2024,Alex Lee,IND,false,1100000,11000,https://example.gov/affidavit/ex-alex-2024,https://example.gov/results,
+Other Pradesh,OT,1,1,Only Seat,2024,Alex Lee,IND,true,1200000,12000,https://example.gov/affidavit/ot-alex,https://example.gov/results,
+Example Pradesh,EX,2,2,South Seat,2020,Sam Review,JP,false,2000000,20000,https://example.gov/affidavit/sam-2020,https://example.gov/results,person-42
+Example Pradesh,EX,2,2,South Seat,2024,Sam Review,JP,true,3000000,30000,https://example.gov/affidavit/sam-2024,https://example.gov/results,person-42
+Example Pradesh,EX,2,1,North Seat,2024,Bad Assets,IND,false,not-a-number,10,https://example.gov/affidavit/bad-assets,https://example.gov/results,
+Example Pradesh,EX,2,1,North Seat,2025,Bad Liabilities,IND,false,1000,,https://example.gov/affidavit/bad-liabilities,https://example.gov/results,
+Example Pradesh,EX,2,1,North Seat,2024.5,Bad Year,IND,false,1000,10,https://example.gov/affidavit/bad-year,https://example.gov/results,
