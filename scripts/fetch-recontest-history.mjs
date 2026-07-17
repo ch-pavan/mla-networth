@@ -1,24 +1,15 @@
 #!/usr/bin/env node
 import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
+import { loadElectionManifest } from "./lib/election-manifest.mjs";
 import {
   attachSnapshotMatches,
   collectPreviousElectionTasks,
   parseRecontestPage,
 } from "./lib/recontest-history.mjs";
 
-const seedElections = [
-  ["Andhra Pradesh",2024,"AndhraPradesh2024"],["Arunachal Pradesh",2024,"ArunachalPradesh2024"],["Assam",2021,"Assam2021"],
-  ["Bihar",2020,"Bihar2020"],["Chhattisgarh",2023,"Chhattisgarh2023"],["Delhi",2025,"Delhi2025"],["Goa",2022,"Goa2022"],
-  ["Gujarat",2022,"Gujarat2022"],["Haryana",2024,"Haryana2024"],["Himachal Pradesh",2022,"HimachalPradesh2022"],
-  ["Jammu Kashmir",2024,"JammuKashmir2024"],["Jharkhand",2024,"Jharkhand2024"],["Karnataka",2023,"Karnataka2023"],
-  ["Kerala",2021,"Kerala2021"],["Madhya Pradesh",2023,"MadhyaPradesh2023"],["Maharashtra",2024,"Maharashtra2024"],
-  ["Manipur",2022,"Manipur2022"],["Meghalaya",2023,"Meghalaya2023"],["Mizoram",2023,"Mizoram2023"],
-  ["Nagaland",2023,"Nagaland2023"],["Odisha",2024,"Odisha2024"],["Puducherry",2021,"Puducherry2021"],
-  ["Punjab",2022,"Punjab2022"],["Rajasthan",2023,"Rajasthan2023"],["Sikkim",2024,"Sikkim2024"],
-  ["Tamil Nadu",2021,"TamilNadu2021"],["Telangana",2023,"Telangana2023"],["Tripura",2023,"Tripura2023"],
-  ["Uttar Pradesh",2022,"UttarPradesh2022"],["Uttarakhand",2022,"Uttarakhand2022"],["West Bengal",2021,"WestBengal2021"],
-];
+const manifest = await loadElectionManifest();
+const seedElections = manifest.elections.map(({ state, year, folder }) => [state, year, folder]);
 
 const urlFor = (folder) => `https://www.myneta.info/${folder}/index.php?action=recontestAssetsComparison`;
 const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -96,7 +87,8 @@ const payload = {
     source: "Association for Democratic Reforms / MyNeta",
     retrievedAt: new Date().toISOString(),
     parserVersion: 2,
-    statesRequested: seedElections.length,
+    statesRequested: new Set(seedElections.map(([state]) => state)).size,
+    manifestElectionFolders: manifest.elections.length,
     electionPagesChecked: results.length,
     electionPagesAvailable: results.filter((result) => result.comparisons.length > 0).length,
     completeElectionPages: results.filter((result) => result.complete).length,
