@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { availableMoney, compareAvailableMoneyDescending, formatCrores as fmt, type MoneyStatus } from "../lib/format-money";
 import { buildVerifiedAssetHistory, normalizePersonName } from "../lib/profile-history";
+import { publicUrl } from "../lib/public-url";
 import { buildDisplayableSeatHistories, compareWinnerElections } from "../lib/winner-history";
 
 type MLA = {
@@ -137,7 +138,7 @@ export default function Home() {
 
   useEffect(()=>{
     const controller=new AbortController();
-    void fetchJson<AdrSnapshot>("/data/adr-sitting-mlas-2025.json",controller.signal).then(data=>{
+    void fetchJson<AdrSnapshot>(publicUrl("/data/adr-sitting-mlas-2025.json"),controller.signal).then(data=>{
       if(!controller.signal.aborted){setSnapshot(data);setDataErrors(current=>({...current,snapshot:undefined}))}
     }).catch(error=>{if(!controller.signal.aborted)setDataErrors(current=>({...current,snapshot:errorMessage(error)}))});
     return ()=>controller.abort();
@@ -145,7 +146,7 @@ export default function Home() {
 
   useEffect(()=>{
     const controller=new AbortController();
-    void fetchJson<CandidateIndex>("/data/candidates/index.json",controller.signal).then(data=>{
+    void fetchJson<CandidateIndex>(publicUrl("/data/candidates/index.json"),controller.signal).then(data=>{
       if(!controller.signal.aborted){setCandidateIndex(data);setDataErrors(current=>({...current,candidateIndex:undefined}))}
     }).catch(error=>{if(!controller.signal.aborted)setDataErrors(current=>({...current,candidateIndex:errorMessage(error)}))});
     return ()=>controller.abort();
@@ -154,7 +155,7 @@ export default function Home() {
   useEffect(()=>{
     if(!requestedSections.history) return;
     const controller=new AbortController();
-    void fetchJson<HistorySnapshot>("/data/adr-recontest-history.json",controller.signal).then(data=>{
+    void fetchJson<HistorySnapshot>(publicUrl("/data/adr-recontest-history.json"),controller.signal).then(data=>{
       if(!controller.signal.aborted){setHistory(data);setDataErrors(current=>({...current,history:undefined}))}
     }).catch(error=>{if(!controller.signal.aborted)setDataErrors(current=>({...current,history:errorMessage(error)}))});
     return ()=>controller.abort();
@@ -163,7 +164,7 @@ export default function Home() {
   useEffect(()=>{
     if(!requestedSections.archive) return;
     const controller=new AbortController();
-    void fetchJson<WinnerArchive>("/data/adr-winner-archive.json",controller.signal).then(data=>{
+    void fetchJson<WinnerArchive>(publicUrl("/data/adr-winner-archive.json"),controller.signal).then(data=>{
       if(!controller.signal.aborted){setArchive(data);setDataErrors(current=>({...current,archive:undefined}))}
     }).catch(error=>{if(!controller.signal.aborted)setDataErrors(current=>({...current,archive:errorMessage(error)}))});
     return ()=>controller.abort();
@@ -199,7 +200,7 @@ export default function Home() {
     if(!election) return;
     const requestId=++candidateRequest.current;
     const controller=new AbortController();
-    void fetchJson<CandidateShard>(election.file,controller.signal).then(data=>{
+    void fetchJson<CandidateShard>(publicUrl(election.file),controller.signal).then(data=>{
       if(!controller.signal.aborted&&requestId===candidateRequest.current){
         setCandidateShard(data);
         setCandidateLoadError("");
@@ -249,7 +250,7 @@ export default function Home() {
   const currentWatchItem=(representative:MLA):WatchItem=>({
     id:`current:${representative.sourceRank??normalizeName(`${representative.state}-${representative.name}-${representative.constituency}`)}`,
     label:`${representative.name} — ${representative.constituency}, ${representative.state}`,
-    href:`/person?type=current&rank=${representative.sourceRank??1}`,
+    href:publicUrl(`/person?type=current&rank=${representative.sourceRank??1}`),
   });
 
   return <><a className="skipLink" href="#main-content">Skip to the database</a><main id="main-content">
@@ -271,7 +272,7 @@ export default function Home() {
           <div className="searchBox"><span aria-hidden="true">⌕</span><input id="search" aria-label="Search representatives" value={query} onChange={e=>{setQuery(e.target.value);setMlaLimit(12)}} placeholder="Search an MLA, constituency, party or state…"/>{query&&<button className="clearSearch" type="button" onClick={()=>setQuery("")} aria-label="Clear representative search">×</button>}<kbd>⌘/Ctrl K</kbd></div>
           <div className="quick"><span>TRY</span>{["D K Shivakumar","Karnataka","BJP"].map(x=><button key={x} onClick={()=>{setQuery(x);setMlaLimit(12);document.getElementById("explore")?.scrollIntoView({behavior:"smooth"})}}>{x}</button>)}</div>
         </div>
-        {headline?<aside className="headlineCard"><div className="cardKicker">BIGGEST DECLARED FORTUNE</div><div className="rank">01</div><h2>{headline.name}</h2><p>{headline.constituency} · {headline.state}</p><div className="bigMoney">{fmt(headline.assets)}</div><div className="rise">{headline.historical!==false?`↗ ${headline.growth}%`:"2025 national snapshot"} <span>{headline.historical!==false?"since previous affidavit":"ADR rank #1"}</span></div><Sparkline values={headline.values}/><button onClick={()=>window.location.assign(`/person?type=current&rank=${headline.sourceRank??1}`)}>View the full record →</button></aside>:<aside className="headlineCard" role={dataErrors.snapshot?"alert":"status"}><div className="cardKicker">CURRENT SNAPSHOT</div><h2>{dataErrors.snapshot?"Data unavailable":"Loading public records…"}</h2><p>{dataErrors.snapshot??"Opening the nationwide sitting-MLA index."}</p>{dataErrors.snapshot&&<button onClick={()=>retryData("snapshot")}>Retry data →</button>}</aside>}
+        {headline?<aside className="headlineCard"><div className="cardKicker">BIGGEST DECLARED FORTUNE</div><div className="rank">01</div><h2>{headline.name}</h2><p>{headline.constituency} · {headline.state}</p><div className="bigMoney">{fmt(headline.assets)}</div><div className="rise">{headline.historical!==false?`↗ ${headline.growth}%`:"2025 national snapshot"} <span>{headline.historical!==false?"since previous affidavit":"ADR rank #1"}</span></div><Sparkline values={headline.values}/><button onClick={()=>window.location.assign(publicUrl(`/person?type=current&rank=${headline.sourceRank??1}`))}>View the full record →</button></aside>:<aside className="headlineCard" role={dataErrors.snapshot?"alert":"status"}><div className="cardKicker">CURRENT SNAPSHOT</div><h2>{dataErrors.snapshot?"Data unavailable":"Loading public records…"}</h2><p>{dataErrors.snapshot??"Opening the nationwide sitting-MLA index."}</p>{dataErrors.snapshot&&<button onClick={()=>retryData("snapshot")}>Retry data →</button>}</aside>}
       </div>
       <div className="ticker"><span>IN NUMBERS</span><div><b>4,123</b><small>assembly constituencies</small></div><div><b>{candidateIndex?.meta.candidateRecords.toLocaleString("en-IN")??(dataErrors.candidateIndex?"Unavailable":"Loading")}</b><small>candidate affidavits</small></div><div><b>{archive?.meta.winnerRecords.toLocaleString("en-IN")??(dataErrors.archive?"Unavailable":"On demand")}</b><small>historical winners</small></div><div><b>{history?.meta.comparisonCount.toLocaleString("en-IN")??(dataErrors.history?"Unavailable":"On demand")}</b><small>asset comparisons</small></div><div><b>{history?`${history.meta.firstYear}—${history.meta.latestYear}`:(dataErrors.history?"Unavailable":"On demand")}</b><small>comparison years covered</small></div></div>
     </section>
@@ -295,7 +296,7 @@ export default function Home() {
       <div className="sectionHead"><div><span className="sectionNo">03 / IMPORTED DATABASE</span><h2>Candidate affidavits in the imported archive.</h2><p>Search MyNeta-analyzed records imported from discovered election folders.</p></div><div className="dataStamp"><i></i> {candidateIndex?`${candidateIndex.meta.candidateRecords.toLocaleString("en-IN")} RECORDS · ${candidateIndex.meta.electionFolders} IMPORTED FOLDERS`:(dataErrors.candidateIndex?"DATABASE UNAVAILABLE":"LOADING DATABASE")}</div></div>
       {dataErrors.candidateIndex&&!candidateIndex&&<div className="empty" role="alert"><p>The candidate database index could not be loaded: {dataErrors.candidateIndex}</p><button className="outline" onClick={()=>retryData("candidateIndex")}>Retry database index</button></div>}
       <div className="candidateControls"><label><span>STATE / UT</span><select value={candidateState} disabled={!candidateIndex} onChange={e=>{const next=e.target.value;candidateRequest.current+=1;setCandidateState(next);setCandidateYear(candidateIndex?.states.find(s=>s.state===next)?.elections[0]?.electionYear??2023);setCandidateShard(null);setCandidateLoadError("");setCandidateLimit(50)}}>{candidateIndex?.states.map(s=><option key={s.state}>{s.state}</option>)}</select></label><label><span>ELECTION</span><select value={candidateYear} disabled={!candidateIndex} onChange={e=>{candidateRequest.current+=1;setCandidateYear(Number(e.target.value));setCandidateShard(null);setCandidateLoadError("");setCandidateLimit(50)}}>{candidateElections.map(e=><option key={e.electionFolder} value={e.electionYear}>{e.electionYear} · {e.candidateCount.toLocaleString("en-IN")} candidates</option>)}</select></label><label className="candidateSearch"><span>SEARCH THIS ELECTION</span><input value={candidateQuery} disabled={!candidateShard} onChange={e=>{setCandidateQuery(e.target.value);setCandidateLimit(50)}} placeholder="Candidate, constituency or party…"/></label></div>
-      <div className="candidateWorkspace"><div className="candidateList"><div className="candidateListHead"><span>{candidateShard?`${candidateShard.meta.candidateCount.toLocaleString("en-IN")} candidates in ${candidateState} ${candidateYear}`:(candidateLoadError?"Election unavailable":"Loading election…")}</span><small>Available declared assets first</small></div>{candidateResults.slice(0,candidateLimit).map(row=>{const assets=availableMoney(row.assets,row.assetsStatus);return <button key={row.candidateId} onClick={()=>window.location.assign(`/person?type=candidate&election=${encodeURIComponent(candidateShard?.meta.electionFolder??"")}&id=${row.candidateId}`)}><div><strong>{row.name}</strong><small>{row.constituency} · {row.party}{row.electionYear&&row.electionYear!==candidateYear?` · ${row.electionYear}`:""}</small></div><span>{fmt(assets===null?null:assets/1e7)} →</span></button>})}{candidateLoadError&&<div className="empty" role="alert"><p>This election could not be loaded: {candidateLoadError}</p><button className="outline" onClick={()=>{candidateRequest.current+=1;setCandidateLoadError("");setCandidateShard(null);setCandidateAttempt(value=>value+1)}}>Retry election</button></div>}{candidateShard&&candidateResults.length===0&&<div className="empty">No candidates match this search.</div>}{candidateLimit<candidateResults.length&&<button className="loadMore" onClick={()=>setCandidateLimit(limit=>Math.min(limit+50,candidateResults.length))}>Load more candidates</button>}</div>
+      <div className="candidateWorkspace"><div className="candidateList"><div className="candidateListHead"><span>{candidateShard?`${candidateShard.meta.candidateCount.toLocaleString("en-IN")} candidates in ${candidateState} ${candidateYear}`:(candidateLoadError?"Election unavailable":"Loading election…")}</span><small>Available declared assets first</small></div>{candidateResults.slice(0,candidateLimit).map(row=>{const assets=availableMoney(row.assets,row.assetsStatus);return <button key={row.candidateId} onClick={()=>window.location.assign(publicUrl(`/person?type=candidate&election=${encodeURIComponent(candidateShard?.meta.electionFolder??"")}&id=${row.candidateId}`))}><div><strong>{row.name}</strong><small>{row.constituency} · {row.party}{row.electionYear&&row.electionYear!==candidateYear?` · ${row.electionYear}`:""}</small></div><span>{fmt(assets===null?null:assets/1e7)} →</span></button>})}{candidateLoadError&&<div className="empty" role="alert"><p>This election could not be loaded: {candidateLoadError}</p><button className="outline" onClick={()=>{candidateRequest.current+=1;setCandidateLoadError("");setCandidateShard(null);setCandidateAttempt(value=>value+1)}}>Retry election</button></div>}{candidateShard&&candidateResults.length===0&&<div className="empty">No candidates match this search.</div>}{candidateLimit<candidateResults.length&&<button className="loadMore" onClick={()=>setCandidateLimit(limit=>Math.min(limit+50,candidateResults.length))}>Load more candidates</button>}</div>
         </div>
     </section>
 
@@ -303,7 +304,7 @@ export default function Home() {
       <div className="sectionHead"><div><span className="sectionNo">04 / CONSTITUENCY ARCHIVE</span><h2>Winner records across imported elections.</h2><p>Browse declared wealth and party succession where a same-seat history can be connected without ambiguity.</p></div><div className="dataStamp"><i></i> {archive?`${archive.meta.winnerRecords.toLocaleString("en-IN")} WINNER RECORDS · ${archive.meta.electionFolders} IMPORTED FOLDERS`:(dataErrors.archive?"ARCHIVE UNAVAILABLE":"LOADING ARCHIVE")}</div></div>
       {dataErrors.archive&&!archive&&<div className="empty archiveEmpty" role="alert"><p>The constituency archive could not be loaded: {dataErrors.archive}</p><button className="outline" onClick={()=>retryData("archive")}>Retry archive</button></div>}
       <div className="archiveControls"><label><span>STATE / UT</span><select value={archiveState} disabled={!archive} onChange={e=>{setArchiveState(e.target.value);setSeatQuery("");setSeatLimit(8)}}>{archiveStates.map(s=><option key={s}>{s}</option>)}</select></label><label className="seatSearch"><span>CONSTITUENCY</span><input value={seatQuery} disabled={!archive} onChange={e=>{setSeatQuery(e.target.value);setSeatLimit(8)}} placeholder="Type a constituency name…"/></label><div className="archiveCount"><b>{seatGroups.length}</b><span>matching seat histories</span></div></div>
-      <div className="seatGrid">{seatGroups.slice(0,seatLimit).map(rows=><article className="seatCard" key={`${rows[0].state}-${rows[0].normalizedConstituency}`}><header><div><span>{rows[0].state}</span><h3>{rows.at(-1)?.constituency}</h3></div><b>{rows.length} elections</b></header><div className="seatTimeline">{rows.map((row,i)=>{const assets=availableMoney(row.assets,row.assetsStatus);return <a href={`/person?type=candidate&election=${encodeURIComponent(row.electionFolder)}&id=${row.candidateId}`} key={`${row.electionFolder}-${row.candidateId}`}><i className={i===rows.length-1?"current":""}></i><time dateTime={row.electionDate??undefined}>{row.electionYear}</time><div><strong>{row.name}</strong><small>{row.party} · {fmt(assets===null?null:assets/1e7)} assets</small></div><span>→</span></a>})}</div></article>)}</div>
+      <div className="seatGrid">{seatGroups.slice(0,seatLimit).map(rows=><article className="seatCard" key={`${rows[0].state}-${rows[0].normalizedConstituency}`}><header><div><span>{rows[0].state}</span><h3>{rows.at(-1)?.constituency}</h3></div><b>{rows.length} elections</b></header><div className="seatTimeline">{rows.map((row,i)=>{const assets=availableMoney(row.assets,row.assetsStatus);return <a href={publicUrl(`/person?type=candidate&election=${encodeURIComponent(row.electionFolder)}&id=${row.candidateId}`)} key={`${row.electionFolder}-${row.candidateId}`}><i className={i===rows.length-1?"current":""}></i><time dateTime={row.electionDate??undefined}>{row.electionYear}</time><div><strong>{row.name}</strong><small>{row.party} · {fmt(assets===null?null:assets/1e7)} assets</small></div><span>→</span></a>})}</div></article>)}</div>
       {seatLimit<seatGroups.length&&<button className="loadMore" onClick={()=>setSeatLimit(limit=>Math.min(limit+8,seatGroups.length))}>Load more seat histories</button>}
       {archive&&seatGroups.length===0&&<div className="empty archiveEmpty">No constituency matches in {archiveState}. Try a shorter name.</div>}
     </section>

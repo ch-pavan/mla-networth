@@ -17,6 +17,7 @@
 /.next/
 /.vinext/
 /out/
+/.github-pages-api/
 
 # misc
 .DS_Store

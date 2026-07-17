@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { availableMoney, declaredNetWorth, formatRupees as money, type MoneyStatus } from "../../lib/format-money";
 import { buildVerifiedAssetHistory, type AssetComparison } from "../../lib/profile-history";
+import { publicUrl } from "../../lib/public-url";
 
 type Candidate = {
   candidateId:number; name:string; normalizedName:string; constituency:string; party:string;
@@ -45,10 +46,10 @@ export default function PersonPage(){
       if(type==="candidate"){
         const folder=params.get("election")??"";
         const id=Number(params.get("id"));
-        const index=await fetchJson<CandidateIndex>("/data/candidates/index.json",controller.signal);
+        const index=await fetchJson<CandidateIndex>(publicUrl("/data/candidates/index.json"),controller.signal);
         const election=index.states.flatMap(s=>s.elections).find(e=>e.electionFolder.toLowerCase()===folder.toLowerCase());
         if(!election)throw new Error("Election record not found");
-        const shard=await fetchJson<CandidateShard>(election.file,controller.signal);
+        const shard=await fetchJson<CandidateShard>(publicUrl(election.file),controller.signal);
         const person=shard.records.find(r=>r.candidateId===id);
         if(!person)throw new Error("Candidate record not found");
         const recordYear=person.electionYear??election.electionYear;
@@ -61,8 +62,8 @@ export default function PersonPage(){
 
       const rank=Number(params.get("rank"));
       const [snapshot,comparisons]=await Promise.all([
-        fetchJson<{records:Current[]}>("/data/adr-sitting-mlas-2025.json",controller.signal),
-        fetchJson<{comparisons:AssetComparison[]}>("/data/adr-recontest-history.json",controller.signal),
+        fetchJson<{records:Current[]}>(publicUrl("/data/adr-sitting-mlas-2025.json"),controller.signal),
+        fetchJson<{comparisons:AssetComparison[]}>(publicUrl("/data/adr-recontest-history.json"),controller.signal),
       ]);
       const person=snapshot.records.find(r=>r.rank===rank);
       if(!person)throw new Error("Representative record not found");

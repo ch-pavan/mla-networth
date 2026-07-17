@@ -55,6 +55,19 @@ node --test tests/rendered-html.test.mjs
 
 CI runs on Node 22 for pushes to `main` and for pull requests.
 
+## Deployment
+
+- Public GitHub Pages: `https://ch-pavan.github.io/mla-networth/`
+- Private ChatGPT Sites: `https://netaworth-india.gamincon4112003.chatgpt.site/`
+
+Pushes to `main` run `.github/workflows/pages.yml`, which builds and publishes the static GitHub Pages edition. Run the same export locally with:
+
+```bash
+npm run build:pages
+```
+
+The Pages build validates the `/mla-networth` project path, bundled data files, internal routes, and social metadata before producing `out/`. It intentionally excludes `app/api/` because GitHub Pages is a static host; the public UI continues to use the versioned JSON archive under `public/data/`. The normal `npm run build` command remains the vinext/ChatGPT Sites build.
+
 ## Data refresh runbook
 
 Read [the data contract](data/README.md) before refreshing anything. Preserve source attribution and review generated diffs; a successful scraper run is not by itself evidence that identities or monetary values are correct.
@@ -86,7 +99,7 @@ The optional normalized-file-to-SQL importer writes a seed file and rejection re
 npm run data:import -- <normalized.csv-or-json> <output-seed.sql>
 ```
 
-Never commit downloaded source documents unless their licensing and repository size have been reviewed. Never commit Cloudflare credentials or local environment files. Deployment is outside the scope of the current release; the repository intentionally has no production deployment configuration or `deploy` package script.
+Never commit downloaded source documents unless their licensing and repository size have been reviewed. Never commit Cloudflare credentials or local environment files. The optional D1 path is not part of either production deployment.
 
 ## Scripts
 
@@ -94,6 +107,7 @@ Never commit downloaded source documents unless their licensing and repository s
 |---|---|
 | `npm run dev` | Local development |
 | `npm run build` | Production build |
+| `npm run build:pages` | Validated static export for GitHub Pages |
 | `npm test` | Build + dataset/UI smoke tests |
 | `npm run lint` | Run ESLint |
 | `npm run typecheck` | Check application and Cloudflare runtime types |

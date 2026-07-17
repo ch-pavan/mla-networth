@@ -1,23 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { headers } from "next/headers";
+import { basePath } from "../lib/public-url";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 const title = "NetaWorth — Follow the money. Know your neta.";
 const description =
   "Explore declared assets, liabilities and wealth growth of India's elected representatives across elections and constituencies.";
 
 async function requestBaseUrl(): Promise<URL | undefined> {
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    try {
+      return new URL(process.env.NEXT_PUBLIC_SITE_URL);
+    } catch {
+      return undefined;
+    }
+  }
+
   const requestHeaders = await headers();
   const host = (requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host"))
     ?.split(",")[0]
@@ -43,8 +41,10 @@ async function requestBaseUrl(): Promise<URL | undefined> {
 
 export async function generateMetadata(): Promise<Metadata> {
   const metadataBase = await requestBaseUrl();
+  const pageRoot = metadataBase ? new URL(metadataBase) : undefined;
+  if (pageRoot && !pageRoot.pathname.endsWith("/")) pageRoot.pathname += "/";
   const socialImage = metadataBase
-    ? [{ url: new URL("/og.png", metadataBase), width: 1731, height: 909, alt: "NetaWorth public election affidavit archive" }]
+    ? [{ url: new URL("og.png", pageRoot), width: 1731, height: 909, alt: "NetaWorth public election affidavit archive" }]
     : undefined;
 
   return {
@@ -52,8 +52,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title,
     description,
     icons: {
-      icon: "/favicon.svg",
-      shortcut: "/favicon.svg",
+      icon: pageRoot ? new URL("favicon.svg", pageRoot) : `${basePath}/favicon.svg`,
+      shortcut: pageRoot ? new URL("favicon.svg", pageRoot) : `${basePath}/favicon.svg`,
     },
     openGraph: {
       type: "website",
@@ -77,9 +77,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
