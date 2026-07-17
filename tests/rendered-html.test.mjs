@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import "./profile-history.test.mjs";
 
 test("ships the NetaWorth product experience", async () => {
   const [page, layout] = await Promise.all([
@@ -88,4 +89,7 @@ test("opens people on a dedicated internal profile route", async () => {
   assert.match(person, /SITTING MLA PROFILE/);
   assert.match(person, /Declared assets over time/);
   assert.match(person, /Back to database/);
+  assert.match(person, /buildVerifiedAssetHistory/);
+  assert.match(person, /Only the selected candidate affidavit is shown/);
+  assert.doesNotMatch(person, /Promise\.all\(elections\.map/);
 });
