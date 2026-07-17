@@ -26,7 +26,11 @@ export function decodeMynetaCell(cell) {
  * their source text so downstream consumers cannot mistake them for zero.
  */
 export function parseMynetaMoneyCell(cell) {
-  const raw = decodeMynetaCell(cell);
+  const source = String(cell ?? "");
+  const raw = decodeMynetaCell(source);
+  if (/<img\b[^>]*\b(?:src\s*=\s*["']?[^>]*image_v2\.php|col\s*=\s*["']?(?:ta|lia)\b)/i.test(source)) {
+    return { value: null, status: "masked", raw };
+  }
   if (!raw) return { value: null, status: "missing", raw };
   if (/^nil\.?$/i.test(raw)) return { value: 0, status: "nil", raw };
 

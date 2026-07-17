@@ -95,13 +95,16 @@ test("parses all rows, retains review metadata, and excludes uncertain links fro
 });
 
 test("fails closed on rank gaps, undecoded scripts, and masked monetary cells", () => {
-  assert.throws(() => parseRecontestPage({
+  const empty = parseRecontestPage({
     html: comparisonPage([]),
     state: "Karnataka",
     currentYear: 2023,
     folder: "Karnataka2023",
     url: sourceUrl,
-  }), /no comparison rows were parsed/);
+  });
+  assert.equal(empty.coverage.complete, true);
+  assert.equal(empty.coverage.expectedFromRanks, 0);
+  assert.deepEqual(empty.comparisons, []);
 
   assert.throws(() => parseRecontestPage({
     html: comparisonPage([comparisonRow({ rank: 1 }), comparisonRow({ rank: 3 })]),

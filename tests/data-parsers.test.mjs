@@ -82,6 +82,10 @@ test("parses declared money while distinguishing nil, masked, and missing cells"
     { value: null, status: "masked", raw: "Rs ********" },
   );
   assert.deepEqual(
+    parseMynetaMoneyCell('<img src="image_v2.php?candidate_id=2138&amp;col=ta">'),
+    { value: null, status: "masked", raw: "" },
+  );
+  assert.deepEqual(
     parseMynetaMoneyCell("Not Available"),
     { value: null, status: "masked", raw: "Not Available" },
   );

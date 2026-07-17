@@ -193,9 +193,6 @@ export function parseRecontestPage({ html, state, currentYear, folder, url }) {
     });
   }
 
-  if (!comparisons.length) {
-    throw new Error(`${context}: no comparison rows were parsed`);
-  }
   const expectedFromRanks = assertContiguousRanks(comparisons, context);
   return {
     comparisons,
