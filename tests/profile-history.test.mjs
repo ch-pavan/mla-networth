@@ -40,7 +40,8 @@ test("builds only an exact-asset contiguous history anchored to the current reco
   ]);
 
   assert.deepEqual(history.map((point) => [point.year, point.assets]), [[2014,100],[2019,200],[2024,300]]);
-  assert.equal(history.at(-1).sourceUrl, "https://www.myneta.info/newer-comparison");
+  assert.equal(history.at(-1).sourceUrl, "https://adrindia.org/report.pdf");
+  assert.equal(history.at(-2).sourceUrl, "https://www.myneta.info/newer-comparison");
 });
 
 test("stops when the next comparison does not continue the exact asset value", () => {

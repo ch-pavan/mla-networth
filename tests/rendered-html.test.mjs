@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import "./data-parsers.test.mjs";
+import "./format-money.test.mjs";
 import "./profile-history.test.mjs";
 
 test("ships the NetaWorth product experience", async () => {
@@ -16,7 +17,10 @@ test("ships the NetaWorth product experience", async () => {
   assert.match(page, /State of wealth/);
   assert.match(page, /Signals in the declarations/);
   assert.match(page, /Public records/);
-  assert.match(page, /D\. K\. Shivakumar/);
+  assert.match(page, /buildVerifiedAssetHistory/);
+  assert.match(page, /Load more representatives/);
+  assert.match(page, /IntersectionObserver/);
+  assert.doesNotMatch(page, /const mlaData/);
   assert.doesNotMatch(page, /codex-preview|Your site is taking shape|react-loading-skeleton/i);
 });
 
@@ -26,7 +30,8 @@ test("ships source links and appropriate data caveats", async () => {
   assert.match(page, /https:\/\/www\.myneta\.info\//);
   assert.match(page, /self-sworn election affidavit/);
   assert.match(page, /not independently audited market wealth/);
-  assert.match(page, /It also contains 4,092 sitting MLAs/);
+  assert.match(page, /snapshot\?\.meta\.recordCount\?\?4092/);
+  assert.match(page, /archive\?\.meta\.winnerRecords\?\?15594/);
 });
 
 test("ships the complete ADR 2025 sitting-MLA appendix", async () => {

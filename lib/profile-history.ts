@@ -75,7 +75,6 @@ export function buildVerifiedAssetHistory(
     if (matches.length !== 1) break;
 
     const match = matches[0];
-    if (points.length === 1) points[0] = { ...points[0], sourceUrl: match.comparisonUrl };
     points.unshift({
       year: match.previousYear,
       assets: match.previousAssets,
