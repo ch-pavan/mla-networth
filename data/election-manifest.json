@@ -1,0 +1,1110 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "name": "Association for Democratic Reforms / MyNeta",
+    "origin": "https://www.myneta.info"
+  },
+  "review": {
+    "status": "reviewed",
+    "reviewedAt": "2026-07-17",
+    "method": "Combined the 121 locally imported candidate-archive folders with manually verified public MyNeta assembly-election folders. Legacy folders absent from the current MyNeta state index were retained when local archive evidence exists."
+  },
+  "availabilitySemantics": {
+    "imported": "The public MyNeta election folder is represented in the local candidate archive at review time.",
+    "verified-not-imported": "The public MyNeta election folder was verified during review but is not yet represented in the local candidate archive.",
+    "excluded": "The folder was reviewed but intentionally omitted because required analyzed-summary pages were unavailable."
+  },
+  "exclusions": [
+    {
+      "state": "Karnataka",
+      "year": 2004,
+      "folder": "karnataka2004",
+      "indexUrl": "https://www.myneta.info/karnataka2004/index.php",
+      "availability": "excluded",
+      "reviewBasis": "public-folder-review",
+      "reason": "Candidate and winner analyzed-summary endpoints returned no pages during review."
+    }
+  ],
+  "elections": [
+    {
+      "state": "Andhra Pradesh",
+      "year": 2024,
+      "folder": "AndhraPradesh2024",
+      "indexUrl": "https://www.myneta.info/AndhraPradesh2024/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Andhra Pradesh",
+      "year": 2019,
+      "folder": "andhrapradesh2019",
+      "indexUrl": "https://www.myneta.info/andhrapradesh2019/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Andhra Pradesh",
+      "year": 2014,
+      "folder": "andhra2014",
+      "indexUrl": "https://www.myneta.info/andhra2014/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Andhra Pradesh",
+      "year": 2009,
+      "folder": "ap09",
+      "indexUrl": "https://www.myneta.info/ap09/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Arunachal Pradesh",
+      "year": 2024,
+      "folder": "ArunachalPradesh2024",
+      "indexUrl": "https://www.myneta.info/ArunachalPradesh2024/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Arunachal Pradesh",
+      "year": 2019,
+      "folder": "ArunachalPradesh2019",
+      "indexUrl": "https://www.myneta.info/ArunachalPradesh2019/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Arunachal Pradesh",
+      "year": 2014,
+      "folder": "arunachal2014",
+      "indexUrl": "https://www.myneta.info/arunachal2014/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Arunachal Pradesh",
+      "year": 2009,
+      "folder": "an2009",
+      "indexUrl": "https://www.myneta.info/an2009/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Arunachal Pradesh",
+      "year": 2004,
+      "folder": "an2004",
+      "indexUrl": "https://www.myneta.info/an2004/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Assam",
+      "year": 2026,
+      "folder": "Assam2026",
+      "indexUrl": "https://www.myneta.info/Assam2026/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review"
+    },
+    {
+      "state": "Assam",
+      "year": 2021,
+      "folder": "Assam2021",
+      "indexUrl": "https://www.myneta.info/Assam2021/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Assam",
+      "year": 2016,
+      "folder": "assam2016",
+      "indexUrl": "https://www.myneta.info/assam2016/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Assam",
+      "year": 2011,
+      "folder": "assam2011",
+      "indexUrl": "https://www.myneta.info/assam2011/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Assam",
+      "year": 2006,
+      "folder": "assam2006",
+      "indexUrl": "https://www.myneta.info/assam2006/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review"
+    },
+    {
+      "state": "Bihar",
+      "year": 2025,
+      "folder": "Bihar2025",
+      "indexUrl": "https://www.myneta.info/Bihar2025/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review"
+    },
+    {
+      "state": "Bihar",
+      "year": 2020,
+      "folder": "Bihar2020",
+      "indexUrl": "https://www.myneta.info/Bihar2020/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Bihar",
+      "year": 2015,
+      "folder": "bihar2015",
+      "indexUrl": "https://www.myneta.info/bihar2015/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Bihar",
+      "year": 2010,
+      "folder": "bih2010",
+      "indexUrl": "https://www.myneta.info/bih2010/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review"
+    },
+    {
+      "state": "Bihar",
+      "year": 2005,
+      "folder": "bih2005",
+      "indexUrl": "https://www.myneta.info/bih2005/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review"
+    },
+    {
+      "state": "Chhattisgarh",
+      "year": 2023,
+      "folder": "Chhattisgarh2023",
+      "indexUrl": "https://www.myneta.info/Chhattisgarh2023/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Chhattisgarh",
+      "year": 2018,
+      "folder": "chhattisgarh2018",
+      "indexUrl": "https://www.myneta.info/chhattisgarh2018/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Chhattisgarh",
+      "year": 2013,
+      "folder": "chhattisgarh2013",
+      "indexUrl": "https://www.myneta.info/chhattisgarh2013/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Chhattisgarh",
+      "year": 2008,
+      "folder": "2008Chhattisgarh",
+      "indexUrl": "https://www.myneta.info/2008Chhattisgarh/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Delhi",
+      "year": 2025,
+      "folder": "Delhi2025",
+      "indexUrl": "https://www.myneta.info/Delhi2025/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Delhi",
+      "year": 2020,
+      "folder": "delhi2020",
+      "indexUrl": "https://www.myneta.info/delhi2020/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Delhi",
+      "year": 2015,
+      "folder": "delhi2015",
+      "indexUrl": "https://www.myneta.info/delhi2015/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Delhi",
+      "year": 2013,
+      "folder": "delhi2013",
+      "indexUrl": "https://www.myneta.info/delhi2013/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Delhi",
+      "year": 2008,
+      "folder": "dl2008",
+      "indexUrl": "https://www.myneta.info/dl2008/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Goa",
+      "year": 2022,
+      "folder": "Goa2022",
+      "indexUrl": "https://www.myneta.info/Goa2022/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Goa",
+      "year": 2017,
+      "folder": "goa2017",
+      "indexUrl": "https://www.myneta.info/goa2017/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Goa",
+      "year": 2012,
+      "folder": "goa2012",
+      "indexUrl": "https://www.myneta.info/goa2012/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Goa",
+      "year": 2007,
+      "folder": "goa2007",
+      "indexUrl": "https://www.myneta.info/goa2007/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Gujarat",
+      "year": 2022,
+      "folder": "Gujarat2022",
+      "indexUrl": "https://www.myneta.info/Gujarat2022/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Gujarat",
+      "year": 2017,
+      "folder": "Gujarat2017",
+      "indexUrl": "https://www.myneta.info/Gujarat2017/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Gujarat",
+      "year": 2012,
+      "folder": "gujarat2012",
+      "indexUrl": "https://www.myneta.info/gujarat2012/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Gujarat",
+      "year": 2007,
+      "folder": "2007Gujarat",
+      "indexUrl": "https://www.myneta.info/2007Gujarat/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Haryana",
+      "year": 2024,
+      "folder": "Haryana2024",
+      "indexUrl": "https://www.myneta.info/Haryana2024/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Haryana",
+      "year": 2019,
+      "folder": "haryana2019",
+      "indexUrl": "https://www.myneta.info/haryana2019/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Haryana",
+      "year": 2014,
+      "folder": "haryana2014",
+      "indexUrl": "https://www.myneta.info/haryana2014/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Haryana",
+      "year": 2009,
+      "folder": "ha2009",
+      "indexUrl": "https://www.myneta.info/ha2009/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Haryana",
+      "year": 2005,
+      "folder": "hr2005",
+      "indexUrl": "https://www.myneta.info/hr2005/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Himachal Pradesh",
+      "year": 2022,
+      "folder": "HimachalPradesh2022",
+      "indexUrl": "https://www.myneta.info/HimachalPradesh2022/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Himachal Pradesh",
+      "year": 2017,
+      "folder": "HimachalPradesh2017",
+      "indexUrl": "https://www.myneta.info/HimachalPradesh2017/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Himachal Pradesh",
+      "year": 2012,
+      "folder": "hp2012",
+      "indexUrl": "https://www.myneta.info/hp2012/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Himachal Pradesh",
+      "year": 2007,
+      "folder": "him2007",
+      "indexUrl": "https://www.myneta.info/him2007/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Jammu Kashmir",
+      "year": 2024,
+      "folder": "JammuKashmir2024",
+      "indexUrl": "https://www.myneta.info/JammuKashmir2024/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Jammu Kashmir",
+      "year": 2014,
+      "folder": "jk2014",
+      "indexUrl": "https://www.myneta.info/jk2014/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review"
+    },
+    {
+      "state": "Jammu Kashmir",
+      "year": 2008,
+      "folder": "jk2008",
+      "indexUrl": "https://www.myneta.info/jk2008/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review"
+    },
+    {
+      "state": "Jharkhand",
+      "year": 2024,
+      "folder": "Jharkhand2024",
+      "indexUrl": "https://www.myneta.info/Jharkhand2024/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Jharkhand",
+      "year": 2019,
+      "folder": "jharkhand2019",
+      "indexUrl": "https://www.myneta.info/jharkhand2019/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Jharkhand",
+      "year": 2014,
+      "folder": "jharkhand2014",
+      "indexUrl": "https://www.myneta.info/jharkhand2014/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Jharkhand",
+      "year": 2009,
+      "folder": "jarka09",
+      "indexUrl": "https://www.myneta.info/jarka09/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Jharkhand",
+      "year": 2005,
+      "folder": "jarka05",
+      "indexUrl": "https://www.myneta.info/jarka05/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Karnataka",
+      "year": 2023,
+      "folder": "Karnataka2023",
+      "indexUrl": "https://www.myneta.info/Karnataka2023/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Karnataka",
+      "year": 2018,
+      "folder": "karnataka2018",
+      "indexUrl": "https://www.myneta.info/karnataka2018/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Karnataka",
+      "year": 2013,
+      "folder": "karnataka2013",
+      "indexUrl": "https://www.myneta.info/karnataka2013/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Karnataka",
+      "year": 2008,
+      "folder": "karnatka2008",
+      "indexUrl": "https://www.myneta.info/karnatka2008/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Kerala",
+      "year": 2026,
+      "folder": "Kerala2026",
+      "indexUrl": "https://www.myneta.info/Kerala2026/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review"
+    },
+    {
+      "state": "Kerala",
+      "year": 2021,
+      "folder": "Kerala2021",
+      "indexUrl": "https://www.myneta.info/Kerala2021/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Kerala",
+      "year": 2016,
+      "folder": "kerala2016",
+      "indexUrl": "https://www.myneta.info/kerala2016/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Kerala",
+      "year": 2011,
+      "folder": "kerala2011",
+      "indexUrl": "https://www.myneta.info/kerala2011/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Kerala",
+      "year": 2006,
+      "folder": "ker2006",
+      "indexUrl": "https://www.myneta.info/ker2006/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Madhya Pradesh",
+      "year": 2023,
+      "folder": "MadhyaPradesh2023",
+      "indexUrl": "https://www.myneta.info/MadhyaPradesh2023/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Madhya Pradesh",
+      "year": 2018,
+      "folder": "madhyapradesh2018",
+      "indexUrl": "https://www.myneta.info/madhyapradesh2018/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Madhya Pradesh",
+      "year": 2013,
+      "folder": "mp2013",
+      "indexUrl": "https://www.myneta.info/mp2013/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Madhya Pradesh",
+      "year": 2008,
+      "folder": "2008mp",
+      "indexUrl": "https://www.myneta.info/2008mp/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Maharashtra",
+      "year": 2024,
+      "folder": "Maharashtra2024",
+      "indexUrl": "https://www.myneta.info/Maharashtra2024/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Maharashtra",
+      "year": 2019,
+      "folder": "maharashtra2019",
+      "indexUrl": "https://www.myneta.info/maharashtra2019/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Maharashtra",
+      "year": 2014,
+      "folder": "maharashtra2014",
+      "indexUrl": "https://www.myneta.info/maharashtra2014/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Maharashtra",
+      "year": 2009,
+      "folder": "mh2009",
+      "indexUrl": "https://www.myneta.info/mh2009/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Maharashtra",
+      "year": 2004,
+      "folder": "mah2004",
+      "indexUrl": "https://www.myneta.info/mah2004/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review"
+    },
+    {
+      "state": "Manipur",
+      "year": 2022,
+      "folder": "Manipur2022",
+      "indexUrl": "https://www.myneta.info/Manipur2022/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Manipur",
+      "year": 2017,
+      "folder": "manipur2017",
+      "indexUrl": "https://www.myneta.info/manipur2017/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Manipur",
+      "year": 2012,
+      "folder": "manipur2012",
+      "indexUrl": "https://www.myneta.info/manipur2012/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Manipur",
+      "year": 2007,
+      "folder": "manipur07",
+      "indexUrl": "https://www.myneta.info/manipur07/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Meghalaya",
+      "year": 2023,
+      "folder": "Meghalaya2023",
+      "indexUrl": "https://www.myneta.info/Meghalaya2023/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Meghalaya",
+      "year": 2018,
+      "folder": "meghalaya2018",
+      "indexUrl": "https://www.myneta.info/meghalaya2018/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Meghalaya",
+      "year": 2013,
+      "folder": "meghalaya2013",
+      "indexUrl": "https://www.myneta.info/meghalaya2013/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Meghalaya",
+      "year": 2008,
+      "folder": "2008Meghalaya",
+      "indexUrl": "https://www.myneta.info/2008Meghalaya/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Mizoram",
+      "year": 2023,
+      "folder": "Mizoram2023",
+      "indexUrl": "https://www.myneta.info/Mizoram2023/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Mizoram",
+      "year": 2018,
+      "folder": "mizoram2018",
+      "indexUrl": "https://www.myneta.info/mizoram2018/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Mizoram",
+      "year": 2013,
+      "folder": "mizoram2013",
+      "indexUrl": "https://www.myneta.info/mizoram2013/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Mizoram",
+      "year": 2008,
+      "folder": "2008Mizoram",
+      "indexUrl": "https://www.myneta.info/2008Mizoram/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Nagaland",
+      "year": 2023,
+      "folder": "Nagaland2023",
+      "indexUrl": "https://www.myneta.info/Nagaland2023/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Nagaland",
+      "year": 2018,
+      "folder": "nagaland2018",
+      "indexUrl": "https://www.myneta.info/nagaland2018/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Nagaland",
+      "year": 2013,
+      "folder": "nagaland2013",
+      "indexUrl": "https://www.myneta.info/nagaland2013/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Nagaland",
+      "year": 2008,
+      "folder": "2008Nagaland",
+      "indexUrl": "https://www.myneta.info/2008Nagaland/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Odisha",
+      "year": 2024,
+      "folder": "Odisha2024",
+      "indexUrl": "https://www.myneta.info/Odisha2024/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Odisha",
+      "year": 2019,
+      "folder": "odisha2019",
+      "indexUrl": "https://www.myneta.info/odisha2019/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Odisha",
+      "year": 2014,
+      "folder": "odisha2014",
+      "indexUrl": "https://www.myneta.info/odisha2014/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Odisha",
+      "year": 2009,
+      "folder": "orissa2009",
+      "indexUrl": "https://www.myneta.info/orissa2009/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Odisha",
+      "year": 2004,
+      "folder": "orissa2004",
+      "indexUrl": "https://www.myneta.info/orissa2004/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review"
+    },
+    {
+      "state": "Puducherry",
+      "year": 2026,
+      "folder": "Puducherry2026",
+      "indexUrl": "https://www.myneta.info/Puducherry2026/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review"
+    },
+    {
+      "state": "Puducherry",
+      "year": 2021,
+      "folder": "Puducherry2021",
+      "indexUrl": "https://www.myneta.info/Puducherry2021/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Puducherry",
+      "year": 2016,
+      "folder": "puducherry2016",
+      "indexUrl": "https://www.myneta.info/puducherry2016/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Puducherry",
+      "year": 2011,
+      "folder": "puducherry2011",
+      "indexUrl": "https://www.myneta.info/puducherry2011/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Puducherry",
+      "year": 2006,
+      "folder": "pond2006",
+      "indexUrl": "https://www.myneta.info/pond2006/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Punjab",
+      "year": 2022,
+      "folder": "Punjab2022",
+      "indexUrl": "https://www.myneta.info/Punjab2022/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Punjab",
+      "year": 2017,
+      "folder": "punjab2017",
+      "indexUrl": "https://www.myneta.info/punjab2017/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Punjab",
+      "year": 2012,
+      "folder": "pb2012",
+      "indexUrl": "https://www.myneta.info/pb2012/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Punjab",
+      "year": 2007,
+      "folder": "pb2007",
+      "indexUrl": "https://www.myneta.info/pb2007/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Rajasthan",
+      "year": 2023,
+      "folder": "Rajasthan2023",
+      "indexUrl": "https://www.myneta.info/Rajasthan2023/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Rajasthan",
+      "year": 2018,
+      "folder": "rajasthan2018",
+      "indexUrl": "https://www.myneta.info/rajasthan2018/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Rajasthan",
+      "year": 2013,
+      "folder": "rajasthan2013",
+      "indexUrl": "https://www.myneta.info/rajasthan2013/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Rajasthan",
+      "year": 2008,
+      "folder": "rj2008",
+      "indexUrl": "https://www.myneta.info/rj2008/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Sikkim",
+      "year": 2024,
+      "folder": "Sikkim2024",
+      "indexUrl": "https://www.myneta.info/Sikkim2024/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Sikkim",
+      "year": 2019,
+      "folder": "sikkim2019",
+      "indexUrl": "https://www.myneta.info/sikkim2019/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Sikkim",
+      "year": 2014,
+      "folder": "sikkim2014",
+      "indexUrl": "https://www.myneta.info/sikkim2014/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Sikkim",
+      "year": 2009,
+      "folder": "sikkim2009",
+      "indexUrl": "https://www.myneta.info/sikkim2009/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Sikkim",
+      "year": 2004,
+      "folder": "sikkim2004",
+      "indexUrl": "https://www.myneta.info/sikkim2004/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review"
+    },
+    {
+      "state": "Tamil Nadu",
+      "year": 2026,
+      "folder": "TamilNadu2026",
+      "indexUrl": "https://www.myneta.info/TamilNadu2026/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review"
+    },
+    {
+      "state": "Tamil Nadu",
+      "year": 2021,
+      "folder": "TamilNadu2021",
+      "indexUrl": "https://www.myneta.info/TamilNadu2021/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Tamil Nadu",
+      "year": 2016,
+      "folder": "tamilnadu2016",
+      "indexUrl": "https://www.myneta.info/tamilnadu2016/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Tamil Nadu",
+      "year": 2011,
+      "folder": "tamilnadu2011",
+      "indexUrl": "https://www.myneta.info/tamilnadu2011/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Tamil Nadu",
+      "year": 2006,
+      "folder": "tn2006",
+      "indexUrl": "https://www.myneta.info/tn2006/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Telangana",
+      "year": 2023,
+      "folder": "Telangana2023",
+      "indexUrl": "https://www.myneta.info/Telangana2023/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Telangana",
+      "year": 2018,
+      "folder": "telangana2018",
+      "indexUrl": "https://www.myneta.info/telangana2018/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Telangana",
+      "year": 2014,
+      "folder": "telangana2014",
+      "indexUrl": "https://www.myneta.info/telangana2014/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Tripura",
+      "year": 2023,
+      "folder": "Tripura2023",
+      "indexUrl": "https://www.myneta.info/Tripura2023/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Tripura",
+      "year": 2018,
+      "folder": "tripura2018",
+      "indexUrl": "https://www.myneta.info/tripura2018/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Tripura",
+      "year": 2013,
+      "folder": "tripura2013",
+      "indexUrl": "https://www.myneta.info/tripura2013/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Tripura",
+      "year": 2008,
+      "folder": "tripura2008",
+      "indexUrl": "https://www.myneta.info/tripura2008/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Uttar Pradesh",
+      "year": 2022,
+      "folder": "UttarPradesh2022",
+      "indexUrl": "https://www.myneta.info/UttarPradesh2022/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Uttar Pradesh",
+      "year": 2017,
+      "folder": "uttarpradesh2017",
+      "indexUrl": "https://www.myneta.info/uttarpradesh2017/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Uttar Pradesh",
+      "year": 2012,
+      "folder": "up2012",
+      "indexUrl": "https://www.myneta.info/up2012/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Uttar Pradesh",
+      "year": 2007,
+      "folder": "up2007",
+      "indexUrl": "https://www.myneta.info/up2007/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Uttarakhand",
+      "year": 2022,
+      "folder": "Uttarakhand2022",
+      "indexUrl": "https://www.myneta.info/Uttarakhand2022/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Uttarakhand",
+      "year": 2017,
+      "folder": "uttarakhand2017",
+      "indexUrl": "https://www.myneta.info/uttarakhand2017/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Uttarakhand",
+      "year": 2012,
+      "folder": "utt2012",
+      "indexUrl": "https://www.myneta.info/utt2012/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "Uttarakhand",
+      "year": 2007,
+      "folder": "utk07",
+      "indexUrl": "https://www.myneta.info/utk07/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "West Bengal",
+      "year": 2026,
+      "folder": "WestBengal2026",
+      "indexUrl": "https://www.myneta.info/WestBengal2026/index.php",
+      "availability": "verified-not-imported",
+      "reviewBasis": "public-folder-review"
+    },
+    {
+      "state": "West Bengal",
+      "year": 2021,
+      "folder": "WestBengal2021",
+      "indexUrl": "https://www.myneta.info/WestBengal2021/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "West Bengal",
+      "year": 2016,
+      "folder": "westbengal2016",
+      "indexUrl": "https://www.myneta.info/westbengal2016/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "West Bengal",
+      "year": 2011,
+      "folder": "westbengal2011",
+      "indexUrl": "https://www.myneta.info/westbengal2011/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    },
+    {
+      "state": "West Bengal",
+      "year": 2006,
+      "folder": "wb2006",
+      "indexUrl": "https://www.myneta.info/wb2006/index.php",
+      "availability": "imported",
+      "reviewBasis": "local-candidate-archive"
+    }
+  ]
+}
