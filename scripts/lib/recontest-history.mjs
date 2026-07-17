@@ -100,10 +100,10 @@ function parseMoneyCell(cell, context) {
 
 function parsePercentCell(cell, context) {
   const match = decodeMynetaText(cell).match(/-?[0-9.]+/);
-  if (!match) throw new Error(`${context}: percentage is missing`);
+  if (!match) return { value: null, status: "missing" };
   const value = Number(match[0]);
   if (!Number.isFinite(value)) throw new Error(`${context}: invalid percentage`);
-  return value;
+  return { value, status: "parsed" };
 }
 
 function assertContiguousRanks(rows, context) {
@@ -171,6 +171,7 @@ export function parseRecontestPage({ html, state, currentYear, folder, url }) {
       && year.previousYearSource === "folder";
     const currentAssets = parseMoneyCell(cells[2], rowContext);
     const previousAssets = parseMoneyCell(cells[3], rowContext);
+    const percentChange = parsePercentCell(cells[5], rowContext);
 
     comparisons.push({
       state,
@@ -184,7 +185,8 @@ export function parseRecontestPage({ html, state, currentYear, folder, url }) {
       currentAssets,
       previousAssets,
       assetChange: currentAssets - previousAssets,
-      percentChange: parsePercentCell(cells[5], rowContext),
+      percentChange: percentChange.value,
+      percentChangeStatus: percentChange.status,
       remarks,
       comparisonUrl,
       previousFolder,

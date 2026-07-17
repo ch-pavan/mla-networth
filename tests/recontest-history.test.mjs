@@ -94,6 +94,20 @@ test("parses all rows, retains review metadata, and excludes uncertain links fro
   assert.equal(parsed.comparisons[2].eligibleForProfileHistory, false);
 });
 
+test("preserves an unavailable derived percentage without dropping the ranked row", () => {
+  const parsed = parseRecontestPage({
+    html: comparisonPage([comparisonRow({ rank: 1, percent: "-" })]),
+    state: "Karnataka",
+    currentYear: 2023,
+    folder: "Karnataka2023",
+    url: sourceUrl,
+  });
+
+  assert.equal(parsed.comparisons[0].percentChange, null);
+  assert.equal(parsed.comparisons[0].percentChangeStatus, "missing");
+  assert.equal(parsed.coverage.parsedComparisonCount, 1);
+});
+
 test("fails closed on rank gaps, undecoded scripts, and masked monetary cells", () => {
   const empty = parseRecontestPage({
     html: comparisonPage([]),

@@ -51,16 +51,25 @@ test("ships the complete ADR 2025 sitting-MLA appendix", async () => {
 
 test("ships national two-election wealth comparisons", async () => {
   const history = JSON.parse(await readFile(new URL("../public/data/adr-recontest-history.json", import.meta.url), "utf8"));
+  assert.equal(history.meta.parserVersion, 2);
   assert.equal(history.meta.statesRequested, 31);
-  assert.equal(history.meta.electionPagesChecked, 121);
-  assert.equal(history.meta.electionPagesAvailable, 94);
-  assert.equal(history.meta.comparisonCount, 7723);
-  assert.equal(history.comparisons.length, 7723);
-  assert.equal(history.meta.snapshotMatchCount, 1376);
+  assert.equal(history.meta.manifestElectionFolders, 135);
+  assert.equal(history.meta.electionPagesChecked, 146);
+  assert.equal(history.meta.electionPagesAvailable, 99);
+  assert.equal(history.meta.completeElectionPages, 146);
+  assert.equal(history.meta.comparisonCount, 10243);
+  assert.equal(history.comparisons.length, 10243);
+  assert.equal(history.meta.snapshotMatchCount, 1604);
+  assert.equal(history.meta.profileEligibleSnapshotMatchCount, 1521);
   assert.deepEqual([history.meta.firstYear, history.meta.latestYear], [2004, 2025]);
+  assert.ok(history.elections.every((election) => election.complete));
+  assert.ok(history.elections.every((election) => election.parsedComparisonCount === election.expectedFromRanks));
+  assert.ok(history.elections.every((election) => election.unresolvedPackedScriptCount === 0));
   assert.ok(history.comparisons.every((row) => row.previousYear < row.currentYear));
   assert.ok(history.comparisons.every((row) => row.currentAssets >= 0 && row.previousAssets >= 0));
   assert.ok(history.comparisons.every((row) => row.assetChange === row.currentAssets - row.previousAssets));
+  assert.ok(history.comparisons.every((row) => row.percentChangeStatus === "parsed" || row.percentChangeStatus === "missing"));
+  assert.ok(history.comparisons.filter((row) => row.identityReviewReason === "pan-different").every((row) => !row.eligibleForProfileHistory));
   assert.ok(history.comparisons.every((row) => row.comparisonUrl.startsWith("https://www.myneta.info/")));
 });
 
