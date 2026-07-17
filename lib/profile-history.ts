@@ -7,6 +7,8 @@ export type AssetComparison = {
   currentAssets: number;
   previousAssets: number;
   comparisonUrl: string;
+  identityReviewStatus?: "source-linked" | "review-required";
+  eligibleForProfileHistory?: boolean;
 };
 
 export type AssetHistoryAnchor = {
@@ -47,7 +49,9 @@ export function buildVerifiedAssetHistory(
   const normalizedName = normalizePersonName(anchor.name);
   const eligible = comparisons.filter((comparison) => {
     const comparisonName = comparison.normalizedName || comparison.name || "";
-    return comparison.state === anchor.state
+    return comparison.eligibleForProfileHistory !== false
+      && comparison.identityReviewStatus !== "review-required"
+      && comparison.state === anchor.state
       && normalizePersonName(comparisonName) === normalizedName
       && Number.isFinite(comparison.currentAssets)
       && Number.isFinite(comparison.previousAssets)

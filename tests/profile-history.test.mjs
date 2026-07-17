@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { stripTypeScriptTypes } from "node:module";
 import test from "node:test";
+import "./recontest-history.test.mjs";
 
 const helperSource = await readFile(new URL("../lib/profile-history.ts", import.meta.url), "utf8");
 const helperModule = await import(`data:text/javascript;base64,${Buffer.from(stripTypeScriptTypes(helperSource)).toString("base64")}`);
@@ -57,6 +58,17 @@ test("refuses to guess when an exact comparison link is ambiguous", () => {
   const history = buildVerifiedAssetHistory(anchor, [
     comparison(),
     comparison({comparisonUrl:"https://www.myneta.info/duplicate"}),
+  ]);
+
+  assert.deepEqual(history, [{year:2024,assets:300,sourceUrl:"https://adrindia.org/report.pdf"}]);
+});
+
+test("excludes comparisons that require identity review", () => {
+  const history = buildVerifiedAssetHistory(anchor, [
+    comparison({
+      identityReviewStatus: "review-required",
+      eligibleForProfileHistory: false,
+    }),
   ]);
 
   assert.deepEqual(history, [{year:2024,assets:300,sourceUrl:"https://adrindia.org/report.pdf"}]);
