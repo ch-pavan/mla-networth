@@ -28,6 +28,7 @@
     "data:match-pc-geo": "node scripts/match-pc-constituencies.mjs"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "d3-geo": "^3.1.1",
     "d3-scale": "^4.0.2",
     "drizzle-orm": "0.45.2",
