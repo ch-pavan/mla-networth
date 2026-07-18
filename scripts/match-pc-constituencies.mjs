@@ -67,6 +67,17 @@ const ALIASES = {
   "Jammu and Kashmir|ANANTNAG RAJOURI": "ANANTNAG",
 };
 
+/** Reviewed corrections for known source-label defects, keyed by state and PC number. */
+const REVIEWED_PC_LABELS = {
+  "Maharashtra|30": "Mumbai South Central",
+  "Maharashtra|31": "Mumbai South",
+};
+
+/** 2019 source predates Ladakh's separate UT label; PC 4 is the Ladakh seat. */
+const REVIEWED_PC_STATES = {
+  "Jammu & Kashmir|4": "Ladakh",
+};
+
 function normalizeConstituency(name) {
   return String(name ?? "")
     .toUpperCase()
@@ -124,10 +135,6 @@ function matchOne(lsNorm, geoByNorm) {
   if (geoByNorm.has(lsNorm)) {
     const hits = uniqueHits(geoByNorm.get(lsNorm));
     if (hits.length === 1) return { kind: "exact", geo: hits[0] };
-    // Identical labels with different codes (DataMeet Mumbai South duplicate): take first.
-    if (hits.length > 1 && hits.every((hit) => normalizeConstituency(hit.name) === lsNorm)) {
-      return { kind: "exact", geo: hits[0] };
-    }
     return { kind: "ambiguous", geo: null, candidates: hits };
   }
   let best = null;
@@ -179,7 +186,11 @@ const layer = topo.objects[layerKey];
 const byState = new Map();
 for (const g of layer.geometries) {
   const props = g.properties ?? {};
+  const reviewedState = REVIEWED_PC_STATES[`${props.st_name}|${props.pc_no}`];
+  if (reviewedState) props.st_name = reviewedState;
   const mapState = toMapState(props.st_name, PC_STATE_TO_MAP);
+  const reviewedLabel = REVIEWED_PC_LABELS[`${mapState}|${props.pc_no}`];
+  if (reviewedLabel) props.pc_name = reviewedLabel;
   const raw = props.pc_name ?? "";
   const norm = normalizeConstituency(raw);
   if (!norm) continue;
@@ -187,7 +198,7 @@ for (const g of layer.geometries) {
   const geoByNorm = byState.get(mapState);
   if (!geoByNorm.has(norm)) geoByNorm.set(norm, []);
   const entry = { name: raw, pcNo: props.pc_no ?? null, stName: props.st_name };
-  // Deduplicate identical PC labels (Mumbai South appears twice in source).
+  // Deduplicate identical feature identifiers only; distinct PC numbers remain reviewable.
   if (!geoByNorm.get(norm).some((hit) => hit.name === entry.name && hit.pcNo === entry.pcNo)) {
     geoByNorm.get(norm).push(entry);
   }
@@ -270,7 +281,7 @@ for (const record of snapshot.records) {
 const matchRate = coverage.total ? coverage.matched / coverage.total : 0;
 const payload = {
   meta: {
-    source: "Lok Sabha sitting MPs × DataMeet india_pc_2019_simplified",
+    source: "Lok Sabha 2024 general-election winners × DataMeet india_pc_2019_simplified",
     pcLayer: layerKey,
     generatedAt: new Date().toISOString(),
     ...coverage,
@@ -296,6 +307,7 @@ const pcIndex = {
   },
 };
 fs.writeFileSync(path.join(geoDir, "pc-index.json"), `${JSON.stringify(pcIndex, null, 2)}\n`);
+fs.writeFileSync(pcTopoPath, `${JSON.stringify(topo)}\n`);
 
 console.log(JSON.stringify(payload.meta, null, 2));
 const unmatched = Object.values(matches).filter((m) => m.status !== "matched").slice(0, 25);

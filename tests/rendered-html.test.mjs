@@ -8,6 +8,7 @@ import "./election-manifest.test.mjs";
 import "./format-money.test.mjs";
 import "./geo-map.test.mjs";
 import "./import-affidavits.test.mjs";
+import "./mp-data-integrity.test.mjs";
 import "./profile-history.test.mjs";
 import "./winner-history.test.mjs";
 

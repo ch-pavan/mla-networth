@@ -25,6 +25,9 @@ export function toAdrStateName(geoStateName: string): string {
     UTTARKHAND: "Uttarakhand",
     "NCT of Delhi": "Delhi",
     "National Capital Territory of Delhi": "Delhi",
+    "NCT Of Delhi": "Delhi",
+    Chattisgarh: "Chhattisgarh",
+    "Jammu And Kashmir": "Jammu Kashmir",
   };
   return map[raw] ?? raw;
 }
@@ -42,6 +45,9 @@ export function toMapStateName(stateName: string): string {
     Uttarkhand: "Uttarakhand",
     "NCT of Delhi": "Delhi",
     "National Capital Territory of Delhi": "Delhi",
+    "NCT Of Delhi": "Delhi",
+    Chattisgarh: "Chhattisgarh",
+    "Jammu And Kashmir": "Jammu and Kashmir",
     "Andaman & Nicobar": "Andaman and Nicobar Islands",
     "Andaman and Nicobar": "Andaman and Nicobar Islands",
     "Dadra & Nagar Haveli": "Dadra and Nagar Haveli and Daman and Diu",

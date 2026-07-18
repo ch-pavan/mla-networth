@@ -1,8 +1,8 @@
 {
   "meta": {
-    "source": "Lok Sabha sitting MPs × DataMeet india_pc_2019_simplified",
+    "source": "Lok Sabha 2024 general-election winners × DataMeet india_pc_2019_simplified",
     "pcLayer": "india_pc_2019_simplified",
-    "generatedAt": "2026-07-17T16:33:29.884Z",
+    "generatedAt": "2026-07-18T10:55:39.470Z",
     "total": 543,
     "matched": 543,
     "unmatched": 0,
@@ -82,6 +82,15 @@
       "geoName": "Visakhapatnam",
       "pcNo": 4
     },
+    "Uttar Pradesh|MATHURA": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "MATHURA",
+      "state": "Uttar Pradesh",
+      "geoName": "Mathura",
+      "pcNo": 17
+    },
     "Karnataka|DAVANAGERE": {
       "status": "matched",
       "method": "alias",
@@ -153,6 +162,15 @@
       "state": "Punjab",
       "geoName": "Bathinda",
       "pcNo": 11
+    },
+    "Maharashtra|BARAMATI": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "BARAMATI",
+      "state": "Maharashtra",
+      "geoName": "Baramati",
+      "pcNo": 35
     },
     "Odisha|KENDRAPARA": {
       "status": "matched",
@@ -226,6 +244,15 @@
       "geoName": "Gurgaon",
       "pcNo": 9
     },
+    "Maharashtra|MUMBAI NORTH": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "MUMBAI NORTH",
+      "state": "Maharashtra",
+      "geoName": "Mumbai North",
+      "pcNo": 26
+    },
     "Telangana|NIZAMABAD": {
       "status": "matched",
       "method": "exact",
@@ -297,6 +324,15 @@
       "state": "Tamil Nadu",
       "geoName": "Vellore",
       "pcNo": 8
+    },
+    "Tripura|TRIPURA EAST": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "TRIPURA EAST (ST)",
+      "state": "Tripura",
+      "geoName": "Tripura East",
+      "pcNo": 2
     },
     "Uttar Pradesh|GAUTAM BUDDHA NAGAR": {
       "status": "matched",
@@ -370,6 +406,15 @@
       "geoName": "Shimoga",
       "pcNo": 14
     },
+    "Andhra Pradesh|ELURU": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "ELURU",
+      "state": "Andhra Pradesh",
+      "geoName": "Eluru",
+      "pcNo": 10
+    },
     "Dadra and Nagar Haveli and Daman and Diu|DADAR NAGAR HAVELI": {
       "status": "matched",
       "method": "alias",
@@ -441,6 +486,15 @@
       "state": "Haryana",
       "geoName": "Faridabad",
       "pcNo": 10
+    },
+    "Andhra Pradesh|RAJAHMUNDRY": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "RAJAHMUNDRY",
+      "state": "Andhra Pradesh",
+      "geoName": "Rajahmundry",
+      "pcNo": 8
     },
     "Tamil Nadu|CHENNAI NORTH": {
       "status": "matched",
@@ -514,6 +568,15 @@
       "geoName": "Outer Manipur",
       "pcNo": 2
     },
+    "Maharashtra|MUMBAI NORTH WEST": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "MUMBAI NORTH - WEST",
+      "state": "Maharashtra",
+      "geoName": "Mumbai North West",
+      "pcNo": 27
+    },
     "Telangana|MALKAJGIRI": {
       "status": "matched",
       "method": "exact",
@@ -585,6 +648,15 @@
       "state": "West Bengal",
       "geoName": "Jangipur",
       "pcNo": 9
+    },
+    "Uttar Pradesh|KAISERGANJ": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "KAISERGANJ",
+      "state": "Uttar Pradesh",
+      "geoName": "Kaiserganj",
+      "pcNo": 57
     },
     "Uttar Pradesh|GHOSI": {
       "status": "matched",
@@ -658,6 +730,15 @@
       "geoName": "Gorakhpur",
       "pcNo": 64
     },
+    "Karnataka|HASSAN": {
+      "status": "matched",
+      "method": "alias",
+      "score": 1,
+      "lsConstituency": "HASSAN",
+      "state": "Karnataka",
+      "geoName": "Haasan",
+      "pcNo": 16
+    },
     "Haryana|SIRSA": {
       "status": "matched",
       "method": "exact",
@@ -729,6 +810,15 @@
       "state": "Andhra Pradesh",
       "geoName": "Kadapa",
       "pcNo": 21
+    },
+    "Gujarat|NAVSARI": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "NAVSARI",
+      "state": "Gujarat",
+      "geoName": "Navsari",
+      "pcNo": 25
     },
     "Rajasthan|JHALAWAR BARAN": {
       "status": "matched",
@@ -802,6 +892,15 @@
       "geoName": "Tiruchirappalli",
       "pcNo": 24
     },
+    "Telangana|NALGONDA": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "NALGONDA",
+      "state": "Telangana",
+      "geoName": "Nalgonda",
+      "pcNo": 13
+    },
     "West Bengal|HOOGHLY": {
       "status": "matched",
       "method": "exact",
@@ -873,6 +972,15 @@
       "state": "Andhra Pradesh",
       "geoName": "Kakinada",
       "pcNo": 6
+    },
+    "West Bengal|SREERAMPUR": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "SREERAMPUR",
+      "state": "West Bengal",
+      "geoName": "Sreerampur",
+      "pcNo": 27
     },
     "Maharashtra|DHULE": {
       "status": "matched",
@@ -946,6 +1054,15 @@
       "geoName": "Paschim Champaran",
       "pcNo": 2
     },
+    "Karnataka|KOPPAL": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "KOPPAL",
+      "state": "Karnataka",
+      "geoName": "Koppal",
+      "pcNo": 8
+    },
     "Maharashtra|BEED": {
       "status": "matched",
       "method": "exact",
@@ -1017,6 +1134,15 @@
       "state": "Maharashtra",
       "geoName": "Thane",
       "pcNo": 25
+    },
+    "Haryana|AMBALA": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "AMBALA (SC)",
+      "state": "Haryana",
+      "geoName": "Ambala",
+      "pcNo": 1
     },
     "Uttar Pradesh|DEORIA": {
       "status": "matched",
@@ -1090,14 +1216,23 @@
       "geoName": "Srikakulam",
       "pcNo": 2
     },
+    "Rajasthan|TONK SAWAI MADHOPUR": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "TONK-SAWAI MADHOPUR",
+      "state": "Rajasthan",
+      "geoName": "Tonk-Sawai Madhopur",
+      "pcNo": 12
+    },
     "Maharashtra|MUMBAI SOUTH CENTRAL": {
       "status": "matched",
-      "method": "fuzzy",
-      "score": 0.8,
+      "method": "exact",
+      "score": 1,
       "lsConstituency": "MUMBAI SOUTH - CENTRAL",
       "state": "Maharashtra",
-      "geoName": "Mumbai North Central",
-      "pcNo": 29
+      "geoName": "Mumbai South Central",
+      "pcNo": 30
     },
     "Assam|DIPHU": {
       "status": "matched",
@@ -1171,6 +1306,15 @@
       "geoName": "Wayanad",
       "pcNo": 4
     },
+    "Uttar Pradesh|RAE BARELI": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "RAE BARELI",
+      "state": "Uttar Pradesh",
+      "geoName": "Rae Bareli",
+      "pcNo": 36
+    },
     "Tamil Nadu|TIRUVANNAMALAI": {
       "status": "matched",
       "method": "exact",
@@ -1233,6 +1377,15 @@
       "state": "Delhi",
       "geoName": "New Delhi",
       "pcNo": 4
+    },
+    "Madhya Pradesh|MANDSOUR": {
+      "status": "matched",
+      "method": "alias",
+      "score": 1,
+      "lsConstituency": "MANDSOUR",
+      "state": "Madhya Pradesh",
+      "geoName": "Mandsaur",
+      "pcNo": 23
     },
     "Rajasthan|BARMER": {
       "status": "matched",
@@ -1306,6 +1459,15 @@
       "geoName": "Korba",
       "pcNo": 4
     },
+    "Bihar|UJIARPUR": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "UJIARPUR",
+      "state": "Bihar",
+      "geoName": "Ujiarpur",
+      "pcNo": 22
+    },
     "Gujarat|SURAT": {
       "status": "matched",
       "method": "exact",
@@ -1377,6 +1539,15 @@
       "state": "Karnataka",
       "geoName": "Uttara Kannada",
       "pcNo": 12
+    },
+    "Maharashtra|BULDHANA": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "BULDHANA",
+      "state": "Maharashtra",
+      "geoName": "Buldhana",
+      "pcNo": 5
     },
     "Uttar Pradesh|ALIGARH": {
       "status": "matched",
@@ -1450,6 +1621,15 @@
       "geoName": "Kalyan",
       "pcNo": 24
     },
+    "Tamil Nadu|CHENNAI SOUTH": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "CHENNAI SOUTH",
+      "state": "Tamil Nadu",
+      "geoName": "Chennai South",
+      "pcNo": 3
+    },
     "Lakshadweep|LAKSHADWEEP": {
       "status": "matched",
       "method": "exact",
@@ -1521,6 +1701,15 @@
       "state": "Madhya Pradesh",
       "geoName": "Sidhi",
       "pcNo": 11
+    },
+    "Bihar|BEGUSARAI": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "BEGUSARAI",
+      "state": "Bihar",
+      "geoName": "Begusarai",
+      "pcNo": 24
     },
     "Gujarat|AHMEDABAD WEST": {
       "status": "matched",
@@ -1594,6 +1783,15 @@
       "geoName": "Bidar",
       "pcNo": 7
     },
+    "Karnataka|BELGAUM": {
+      "status": "matched",
+      "method": "alias",
+      "score": 1,
+      "lsConstituency": "BELGAUM",
+      "state": "Karnataka",
+      "geoName": "Belagavi",
+      "pcNo": 2
+    },
     "Rajasthan|AJMER": {
       "status": "matched",
       "method": "exact",
@@ -1639,14 +1837,14 @@
       "geoName": "Krishnagiri",
       "pcNo": 9
     },
-    "Uttar Pradesh|HAMIRPUR": {
+    "Himachal Pradesh|HAMIRPUR": {
       "status": "matched",
       "method": "exact",
       "score": 1,
       "lsConstituency": "HAMIRPUR",
-      "state": "Uttar Pradesh",
+      "state": "Himachal Pradesh",
       "geoName": "Hamirpur",
-      "pcNo": 47
+      "pcNo": 3
     },
     "Bihar|PURNIA": {
       "status": "matched",
@@ -1665,6 +1863,15 @@
       "state": "Uttar Pradesh",
       "geoName": "Aonla",
       "pcNo": 24
+    },
+    "Delhi|CHANDNI CHOWK": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "CHANDNI CHOWK",
+      "state": "Delhi",
+      "geoName": "Chandni Chowk",
+      "pcNo": 1
     },
     "Haryana|BHIWANI MAHENDRAGARH": {
       "status": "matched",
@@ -1720,14 +1927,14 @@
       "geoName": "North Goa",
       "pcNo": 1
     },
-    "Maharashtra|AURANGABAD": {
+    "Bihar|AURANGABAD": {
       "status": "matched",
       "method": "exact",
       "score": 1,
       "lsConstituency": "AURANGABAD",
-      "state": "Maharashtra",
+      "state": "Bihar",
       "geoName": "Aurangabad",
-      "pcNo": 19
+      "pcNo": 37
     },
     "Telangana|ZAHIRABAD": {
       "status": "matched",
@@ -1737,6 +1944,15 @@
       "state": "Telangana",
       "geoName": "Zahirabad",
       "pcNo": 5
+    },
+    "Rajasthan|KOTA": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "KOTA",
+      "state": "Rajasthan",
+      "geoName": "Kota",
+      "pcNo": 24
     },
     "Maharashtra|WARDHA": {
       "status": "matched",
@@ -1783,6 +1999,15 @@
       "geoName": "Agra",
       "pcNo": 18
     },
+    "Maharashtra|AURANGABAD": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "AURANGABAD",
+      "state": "Maharashtra",
+      "geoName": "Aurangabad",
+      "pcNo": 19
+    },
     "Maharashtra|PARBHANI": {
       "status": "matched",
       "method": "exact",
@@ -1800,6 +2025,15 @@
       "state": "Bihar",
       "geoName": "Pataliputra",
       "pcNo": 31
+    },
+    "Punjab|JALANDHAR": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "JALANDHAR (SC)",
+      "state": "Punjab",
+      "geoName": "Jalandhar",
+      "pcNo": 4
     },
     "West Bengal|BURDWAN DURGAPUR": {
       "status": "matched",
@@ -1873,6 +2107,15 @@
       "geoName": "Kottayam",
       "pcNo": 14
     },
+    "Karnataka|MYSORE": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "MYSORE",
+      "state": "Karnataka",
+      "geoName": "Mysore",
+      "pcNo": 21
+    },
     "Madhya Pradesh|SATNA": {
       "status": "matched",
       "method": "exact",
@@ -1944,6 +2187,15 @@
       "state": "Uttar Pradesh",
       "geoName": "Muzaffarnagar",
       "pcNo": 3
+    },
+    "Andhra Pradesh|KURNOOL": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "KURNOOL",
+      "state": "Andhra Pradesh",
+      "geoName": "Kurnool",
+      "pcNo": 18
     },
     "Madhya Pradesh|VIDISHA": {
       "status": "matched",
@@ -2017,6 +2269,15 @@
       "geoName": "Ahmedabad East",
       "pcNo": 7
     },
+    "Odisha|SUNDARGARH": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "SUNDARGARH (ST)",
+      "state": "Odisha",
+      "geoName": "Sundargarh",
+      "pcNo": 2
+    },
     "Jharkhand|CHATRA": {
       "status": "matched",
       "method": "exact",
@@ -2088,6 +2349,15 @@
       "state": "Maharashtra",
       "geoName": "Palghar",
       "pcNo": 22
+    },
+    "Maharashtra|HINGOLI": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "HINGOLI",
+      "state": "Maharashtra",
+      "geoName": "Hingoli",
+      "pcNo": 15
     },
     "Gujarat|PORBANDAR": {
       "status": "matched",
@@ -2161,6 +2431,15 @@
       "geoName": "Barasat",
       "pcNo": 17
     },
+    "Karnataka|BAGALKOT": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "BAGALKOT",
+      "state": "Karnataka",
+      "geoName": "Bagalkot",
+      "pcNo": 3
+    },
     "Maharashtra|OSMANABAD": {
       "status": "matched",
       "method": "exact",
@@ -2231,6 +2510,15 @@
       "lsConstituency": "GURDASPUR",
       "state": "Punjab",
       "geoName": "Gurdaspur",
+      "pcNo": 1
+    },
+    "Gujarat|KACHCHH": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "KACHCHH (SC)",
+      "state": "Gujarat",
+      "geoName": "Kachchh",
       "pcNo": 1
     },
     "Odisha|KORAPUT": {
@@ -2305,6 +2593,15 @@
       "geoName": "Patan",
       "pcNo": 3
     },
+    "Haryana|HISAR": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "HISAR",
+      "state": "Haryana",
+      "geoName": "Hisar",
+      "pcNo": 4
+    },
     "Bihar|BUXAR": {
       "status": "matched",
       "method": "exact",
@@ -2376,6 +2673,15 @@
       "state": "Madhya Pradesh",
       "geoName": "Rajgarh",
       "pcNo": 20
+    },
+    "Bihar|JAMUI": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "JAMUI (SC)",
+      "state": "Bihar",
+      "geoName": "Jamui",
+      "pcNo": 40
     },
     "Kerala|KANNUR": {
       "status": "matched",
@@ -2449,6 +2755,15 @@
       "geoName": "Balaghat",
       "pcNo": 15
     },
+    "Himachal Pradesh|KANGRA": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "KANGRA",
+      "state": "Himachal Pradesh",
+      "geoName": "Kangra",
+      "pcNo": 1
+    },
     "Bihar|MADHUBANI": {
       "status": "matched",
       "method": "exact",
@@ -2520,6 +2835,15 @@
       "state": "Bihar",
       "geoName": "Khagaria",
       "pcNo": 25
+    },
+    "Uttar Pradesh|LALGANJ": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "LALGANJ (SC)",
+      "state": "Uttar Pradesh",
+      "geoName": "Lalganj",
+      "pcNo": 68
     },
     "Madhya Pradesh|MANDLA": {
       "status": "matched",
@@ -2593,6 +2917,15 @@
       "geoName": "Ratlam",
       "pcNo": 24
     },
+    "West Bengal|DUM DUM": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "DUM DUM",
+      "state": "West Bengal",
+      "geoName": "Dum Dum",
+      "pcNo": 16
+    },
     "Madhya Pradesh|REWA": {
       "status": "matched",
       "method": "exact",
@@ -2627,7 +2960,16 @@
       "lsConstituency": "MUMBAI SOUTH",
       "state": "Maharashtra",
       "geoName": "Mumbai South",
-      "pcNo": 30
+      "pcNo": 31
+    },
+    "Uttar Pradesh|HAMIRPUR": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "HAMIRPUR",
+      "state": "Uttar Pradesh",
+      "geoName": "Hamirpur",
+      "pcNo": 47
     },
     "Madhya Pradesh|SHAHDOL": {
       "status": "matched",
@@ -2655,6 +2997,15 @@
       "state": "Tamil Nadu",
       "geoName": "Theni",
       "pcNo": 33
+    },
+    "Jharkhand|GIRIDIH": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "GIRIDIH",
+      "state": "Jharkhand",
+      "geoName": "Giridih",
+      "pcNo": 6
     },
     "Arunachal Pradesh|ARUNACHAL WEST": {
       "status": "matched",
@@ -2728,6 +3079,15 @@
       "geoName": "Kheri",
       "pcNo": 28
     },
+    "Uttar Pradesh|AKBARPUR": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "AKBARPUR",
+      "state": "Uttar Pradesh",
+      "geoName": "Akbarpur",
+      "pcNo": 44
+    },
     "Assam|DIBRUGARH": {
       "status": "matched",
       "method": "exact",
@@ -2799,6 +3159,15 @@
       "state": "Bihar",
       "geoName": "Samastipur",
       "pcNo": 23
+    },
+    "Maharashtra|HATKANANGALE": {
+      "status": "matched",
+      "method": "alias",
+      "score": 1,
+      "lsConstituency": "HATKANANGALE",
+      "state": "Maharashtra",
+      "geoName": "Hatkanangle",
+      "pcNo": 48
     },
     "Himachal Pradesh|SHIMLA": {
       "status": "matched",
@@ -2872,6 +3241,15 @@
       "geoName": "Nalanda",
       "pcNo": 29
     },
+    "Uttar Pradesh|MIRZAPUR": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "MIRZAPUR",
+      "state": "Uttar Pradesh",
+      "geoName": "Mirzapur",
+      "pcNo": 79
+    },
     "Uttar Pradesh|SITAPUR": {
       "status": "matched",
       "method": "exact",
@@ -2943,6 +3321,15 @@
       "state": "Meghalaya",
       "geoName": "Tura",
       "pcNo": 2
+    },
+    "Maharashtra|MUMBAI NORTH EAST": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "MUMBAI NORTH - EAST",
+      "state": "Maharashtra",
+      "geoName": "Mumbai North East",
+      "pcNo": 28
     },
     "Gujarat|MAHESANA": {
       "status": "matched",
@@ -3016,6 +3403,15 @@
       "geoName": "Bikaner",
       "pcNo": 2
     },
+    "Punjab|SANGRUR": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "SANGRUR",
+      "state": "Punjab",
+      "geoName": "Sangrur",
+      "pcNo": 12
+    },
     "Uttar Pradesh|SULTANPUR": {
       "status": "matched",
       "method": "exact",
@@ -3087,6 +3483,15 @@
       "state": "Uttar Pradesh",
       "geoName": "Bulandshahr",
       "pcNo": 14
+    },
+    "Jammu and Kashmir|SRINAGAR": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "SRINAGAR",
+      "state": "Jammu and Kashmir",
+      "geoName": "Srinagar",
+      "pcNo": 2
     },
     "Karnataka|BELLARY": {
       "status": "matched",
@@ -3160,6 +3565,15 @@
       "geoName": "Sant Kabir Nagar",
       "pcNo": 62
     },
+    "Gujarat|JUNAGADH": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "JUNAGADH",
+      "state": "Gujarat",
+      "geoName": "Junagadh",
+      "pcNo": 13
+    },
     "West Bengal|BANGAON": {
       "status": "matched",
       "method": "exact",
@@ -3231,6 +3645,15 @@
       "state": "Kerala",
       "geoName": "Kollam",
       "pcNo": 18
+    },
+    "Telangana|ADILABAD": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "ADILABAD (ST)",
+      "state": "Telangana",
+      "geoName": "Adilabad",
+      "pcNo": 1
     },
     "West Bengal|BISHNUPUR": {
       "status": "matched",
@@ -3304,6 +3727,15 @@
       "geoName": "North West Delhi",
       "pcNo": 5
     },
+    "Andaman and Nicobar Islands|ANDAMAN AND NICOBAR ISLANDS": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "ANDAMAN AND NICOBAR ISLANDS",
+      "state": "Andaman and Nicobar Islands",
+      "geoName": "Andaman and Nicobar Islands",
+      "pcNo": 1
+    },
     "Uttar Pradesh|BARABANKI": {
       "status": "matched",
       "method": "exact",
@@ -3375,6 +3807,15 @@
       "state": "Gujarat",
       "geoName": "Bhavnagar",
       "pcNo": 15
+    },
+    "Bihar|KARAKAT": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "KARAKAT",
+      "state": "Bihar",
+      "geoName": "Karakat",
+      "pcNo": 35
     },
     "Gujarat|BHARUCH": {
       "status": "matched",
@@ -3448,6 +3889,15 @@
       "geoName": "Chidambaram",
       "pcNo": 27
     },
+    "Assam|LAKHIMPUR": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "LAKHIMPUR",
+      "state": "Assam",
+      "geoName": "Lakhimpur",
+      "pcNo": 14
+    },
     "Jharkhand|RANCHI": {
       "status": "matched",
       "method": "exact",
@@ -3518,6 +3968,15 @@
       "lsConstituency": "MORENA",
       "state": "Madhya Pradesh",
       "geoName": "Morena",
+      "pcNo": 1
+    },
+    "Odisha|BARGARH": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "BARGARH",
+      "state": "Odisha",
+      "geoName": "Bargarh",
       "pcNo": 1
     },
     "West Bengal|RANAGHAT": {
@@ -3592,6 +4051,15 @@
       "geoName": "Madurai",
       "pcNo": 32
     },
+    "Kerala|MALAPPURAM": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "MALAPPURAM",
+      "state": "Kerala",
+      "geoName": "Malappuram",
+      "pcNo": 6
+    },
     "Assam|KAZIRANGA": {
       "status": "matched",
       "method": "alias",
@@ -3664,6 +4132,15 @@
       "geoName": "Karimganj",
       "pcNo": 1
     },
+    "Madhya Pradesh|BETUL": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "BETUL (ST)",
+      "state": "Madhya Pradesh",
+      "geoName": "Betul",
+      "pcNo": 29
+    },
     "Odisha|JAGATSINGHPUR": {
       "status": "matched",
       "method": "exact",
@@ -3672,6 +4149,15 @@
       "state": "Odisha",
       "geoName": "Jagatsinghpur",
       "pcNo": 16
+    },
+    "Bihar|MAHARAJGANJ": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "MAHARAJGANJ",
+      "state": "Bihar",
+      "geoName": "Maharajganj",
+      "pcNo": 19
     },
     "Maharashtra|DINDORI": {
       "status": "matched",
@@ -3726,6 +4212,15 @@
       "state": "Mizoram",
       "geoName": "Mizoram",
       "pcNo": 1
+    },
+    "Gujarat|CHHOTA UDAIPUR": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "CHHOTA UDAIPUR (ST)",
+      "state": "Gujarat",
+      "geoName": "Chhota Udaipur",
+      "pcNo": 21
     },
     "Madhya Pradesh|DAMOH": {
       "status": "matched",
@@ -3799,6 +4294,15 @@
       "geoName": "Janjgir",
       "pcNo": 3
     },
+    "West Bengal|KOLKATA DAKSHIN": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "KOLKATA DAKSHIN",
+      "state": "West Bengal",
+      "geoName": "Kolkata Dakshin",
+      "pcNo": 23
+    },
     "Tamil Nadu|KARUR": {
       "status": "matched",
       "method": "exact",
@@ -3870,6 +4374,15 @@
       "state": "Chhattisgarh",
       "geoName": "Bilaspur",
       "pcNo": 5
+    },
+    "Meghalaya|SHILLONG": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "SHILLONG (ST)",
+      "state": "Meghalaya",
+      "geoName": "Shillong",
+      "pcNo": 1
     },
     "West Bengal|JHARGRAM": {
       "status": "matched",
@@ -3943,6 +4456,15 @@
       "geoName": "Bhagalpur",
       "pcNo": 26
     },
+    "Rajasthan|BANSWARA": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "BANSWARA (ST)",
+      "state": "Rajasthan",
+      "geoName": "Banswara",
+      "pcNo": 20
+    },
     "Rajasthan|RAJSAMAND": {
       "status": "matched",
       "method": "exact",
@@ -4014,6 +4536,15 @@
       "state": "Gujarat",
       "geoName": "Vadodara",
       "pcNo": 20
+    },
+    "West Bengal|HOWRAH": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "HOWRAH",
+      "state": "West Bengal",
+      "geoName": "Howrah",
+      "pcNo": 25
     },
     "Kerala|VADAKARA": {
       "status": "matched",
@@ -4087,6 +4618,15 @@
       "geoName": "Banaskantha",
       "pcNo": 2
     },
+    "Odisha|KEONJHAR": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "KEONJHAR (ST)",
+      "state": "Odisha",
+      "geoName": "Keonjhar",
+      "pcNo": 4
+    },
     "Gujarat|AMRELI": {
       "status": "matched",
       "method": "exact",
@@ -4158,6 +4698,15 @@
       "state": "West Bengal",
       "geoName": "Alipurduars",
       "pcNo": 2
+    },
+    "Odisha|DHENKANAL": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "DHENKANAL",
+      "state": "Odisha",
+      "geoName": "Dhenkanal",
+      "pcNo": 9
     },
     "Jharkhand|KHUNTI": {
       "status": "matched",
@@ -4231,6 +4780,15 @@
       "geoName": "Alathur",
       "pcNo": 9
     },
+    "Uttar Pradesh|NAGINA": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "NAGINA (SC)",
+      "state": "Uttar Pradesh",
+      "geoName": "Nagina",
+      "pcNo": 5
+    },
     "Chhattisgarh|BASTAR": {
       "status": "matched",
       "method": "exact",
@@ -4303,6 +4861,15 @@
       "geoName": "Nagaland",
       "pcNo": 1
     },
+    "Punjab|KHADOOR SAHIB": {
+      "status": "matched",
+      "method": "exact",
+      "score": 1,
+      "lsConstituency": "KHADOOR SAHIB",
+      "state": "Punjab",
+      "geoName": "Khadoor Sahib",
+      "pcNo": 3
+    },
     "Uttar Pradesh|MACHHLISHAHR": {
       "status": "matched",
       "method": "exact",
@@ -4329,546 +4896,6 @@
       "state": "West Bengal",
       "geoName": "Purulia",
       "pcNo": 35
-    },
-    "Andaman and Nicobar Islands|ANDAMAN AND NICOBAR ISLANDS": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "ANDAMAN AND NICOBAR ISLANDS",
-      "state": "Andaman and Nicobar Islands",
-      "geoName": "Andaman and Nicobar Islands",
-      "pcNo": 1
-    },
-    "Andhra Pradesh|ELURU": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "ELURU",
-      "state": "Andhra Pradesh",
-      "geoName": "Eluru",
-      "pcNo": 10
-    },
-    "Andhra Pradesh|KURNOOL": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "KURNOOL",
-      "state": "Andhra Pradesh",
-      "geoName": "Kurnool",
-      "pcNo": 18
-    },
-    "Andhra Pradesh|RAJAHMUNDRY": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "RAJAHMUNDRY",
-      "state": "Andhra Pradesh",
-      "geoName": "Rajahmundry",
-      "pcNo": 8
-    },
-    "Assam|LAKHIMPUR": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "LAKHIMPUR",
-      "state": "Assam",
-      "geoName": "Lakhimpur",
-      "pcNo": 14
-    },
-    "Bihar|BEGUSARAI": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "BEGUSARAI",
-      "state": "Bihar",
-      "geoName": "Begusarai",
-      "pcNo": 24
-    },
-    "Bihar|JAMUI": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "JAMUI (SC)",
-      "state": "Bihar",
-      "geoName": "Jamui",
-      "pcNo": 40
-    },
-    "Bihar|KARAKAT": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "KARAKAT",
-      "state": "Bihar",
-      "geoName": "Karakat",
-      "pcNo": 35
-    },
-    "Bihar|UJIARPUR": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "UJIARPUR",
-      "state": "Bihar",
-      "geoName": "Ujiarpur",
-      "pcNo": 22
-    },
-    "Delhi|CHANDNI CHOWK": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "CHANDNI CHOWK",
-      "state": "Delhi",
-      "geoName": "Chandni Chowk",
-      "pcNo": 1
-    },
-    "Gujarat|CHHOTA UDAIPUR": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "CHHOTA UDAIPUR (ST)",
-      "state": "Gujarat",
-      "geoName": "Chhota Udaipur",
-      "pcNo": 21
-    },
-    "Gujarat|JUNAGADH": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "JUNAGADH",
-      "state": "Gujarat",
-      "geoName": "Junagadh",
-      "pcNo": 13
-    },
-    "Gujarat|KACHCHH": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "KACHCHH (SC)",
-      "state": "Gujarat",
-      "geoName": "Kachchh",
-      "pcNo": 1
-    },
-    "Gujarat|NAVSARI": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "NAVSARI",
-      "state": "Gujarat",
-      "geoName": "Navsari",
-      "pcNo": 25
-    },
-    "Haryana|AMBALA": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "AMBALA (SC)",
-      "state": "Haryana",
-      "geoName": "Ambala",
-      "pcNo": 1
-    },
-    "Haryana|HISAR": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "HISAR",
-      "state": "Haryana",
-      "geoName": "Hisar",
-      "pcNo": 4
-    },
-    "Himachal Pradesh|KANGRA": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "KANGRA",
-      "state": "Himachal Pradesh",
-      "geoName": "Kangra",
-      "pcNo": 1
-    },
-    "Jammu and Kashmir|SRINAGAR": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "SRINAGAR",
-      "state": "Jammu and Kashmir",
-      "geoName": "Srinagar",
-      "pcNo": 2
-    },
-    "Jharkhand|GIRIDIH": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "GIRIDIH",
-      "state": "Jharkhand",
-      "geoName": "Giridih",
-      "pcNo": 6
-    },
-    "Karnataka|BAGALKOT": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "BAGALKOT",
-      "state": "Karnataka",
-      "geoName": "Bagalkot",
-      "pcNo": 3
-    },
-    "Karnataka|BELGAUM": {
-      "status": "matched",
-      "method": "alias",
-      "score": 1,
-      "lsConstituency": "BELGAUM",
-      "state": "Karnataka",
-      "geoName": "Belagavi",
-      "pcNo": 2
-    },
-    "Karnataka|HASSAN": {
-      "status": "matched",
-      "method": "alias",
-      "score": 1,
-      "lsConstituency": "HASSAN",
-      "state": "Karnataka",
-      "geoName": "Haasan",
-      "pcNo": 16
-    },
-    "Karnataka|KOPPAL": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "KOPPAL",
-      "state": "Karnataka",
-      "geoName": "Koppal",
-      "pcNo": 8
-    },
-    "Karnataka|MYSORE": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "MYSORE",
-      "state": "Karnataka",
-      "geoName": "Mysore",
-      "pcNo": 21
-    },
-    "Kerala|MALAPPURAM": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "MALAPPURAM",
-      "state": "Kerala",
-      "geoName": "Malappuram",
-      "pcNo": 6
-    },
-    "Madhya Pradesh|BETUL": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "BETUL (ST)",
-      "state": "Madhya Pradesh",
-      "geoName": "Betul",
-      "pcNo": 29
-    },
-    "Madhya Pradesh|MANDSOUR": {
-      "status": "matched",
-      "method": "alias",
-      "score": 1,
-      "lsConstituency": "MANDSOUR",
-      "state": "Madhya Pradesh",
-      "geoName": "Mandsaur",
-      "pcNo": 23
-    },
-    "Maharashtra|BARAMATI": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "BARAMATI",
-      "state": "Maharashtra",
-      "geoName": "Baramati",
-      "pcNo": 35
-    },
-    "Maharashtra|BULDHANA": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "BULDHANA",
-      "state": "Maharashtra",
-      "geoName": "Buldhana",
-      "pcNo": 5
-    },
-    "Maharashtra|HATKANANGALE": {
-      "status": "matched",
-      "method": "alias",
-      "score": 1,
-      "lsConstituency": "HATKANANGALE",
-      "state": "Maharashtra",
-      "geoName": "Hatkanangle",
-      "pcNo": 48
-    },
-    "Maharashtra|HINGOLI": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "HINGOLI",
-      "state": "Maharashtra",
-      "geoName": "Hingoli",
-      "pcNo": 15
-    },
-    "Maharashtra|MUMBAI NORTH": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "MUMBAI NORTH",
-      "state": "Maharashtra",
-      "geoName": "Mumbai North",
-      "pcNo": 26
-    },
-    "Maharashtra|MUMBAI NORTH EAST": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "MUMBAI NORTH - EAST",
-      "state": "Maharashtra",
-      "geoName": "Mumbai North East",
-      "pcNo": 28
-    },
-    "Maharashtra|MUMBAI NORTH WEST": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "MUMBAI NORTH - WEST",
-      "state": "Maharashtra",
-      "geoName": "Mumbai North West",
-      "pcNo": 27
-    },
-    "Meghalaya|SHILLONG": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "SHILLONG (ST)",
-      "state": "Meghalaya",
-      "geoName": "Shillong",
-      "pcNo": 1
-    },
-    "Odisha|BARGARH": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "BARGARH",
-      "state": "Odisha",
-      "geoName": "Bargarh",
-      "pcNo": 1
-    },
-    "Odisha|DHENKANAL": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "DHENKANAL",
-      "state": "Odisha",
-      "geoName": "Dhenkanal",
-      "pcNo": 9
-    },
-    "Odisha|KEONJHAR": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "KEONJHAR (ST)",
-      "state": "Odisha",
-      "geoName": "Keonjhar",
-      "pcNo": 4
-    },
-    "Odisha|SUNDARGARH": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "SUNDARGARH (ST)",
-      "state": "Odisha",
-      "geoName": "Sundargarh",
-      "pcNo": 2
-    },
-    "Punjab|JALANDHAR": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "JALANDHAR (SC)",
-      "state": "Punjab",
-      "geoName": "Jalandhar",
-      "pcNo": 4
-    },
-    "Punjab|KHADOOR SAHIB": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "KHADOOR SAHIB",
-      "state": "Punjab",
-      "geoName": "Khadoor Sahib",
-      "pcNo": 3
-    },
-    "Punjab|SANGRUR": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "SANGRUR",
-      "state": "Punjab",
-      "geoName": "Sangrur",
-      "pcNo": 12
-    },
-    "Rajasthan|BANSWARA": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "BANSWARA (ST)",
-      "state": "Rajasthan",
-      "geoName": "Banswara",
-      "pcNo": 20
-    },
-    "Rajasthan|KOTA": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "KOTA",
-      "state": "Rajasthan",
-      "geoName": "Kota",
-      "pcNo": 24
-    },
-    "Rajasthan|TONK SAWAI MADHOPUR": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "TONK-SAWAI MADHOPUR",
-      "state": "Rajasthan",
-      "geoName": "Tonk-Sawai Madhopur",
-      "pcNo": 12
-    },
-    "Tamil Nadu|CHENNAI SOUTH": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "CHENNAI SOUTH",
-      "state": "Tamil Nadu",
-      "geoName": "Chennai South",
-      "pcNo": 3
-    },
-    "Telangana|ADILABAD": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "ADILABAD (ST)",
-      "state": "Telangana",
-      "geoName": "Adilabad",
-      "pcNo": 1
-    },
-    "Telangana|NALGONDA": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "NALGONDA",
-      "state": "Telangana",
-      "geoName": "Nalgonda",
-      "pcNo": 13
-    },
-    "Tripura|TRIPURA EAST": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "TRIPURA EAST (ST)",
-      "state": "Tripura",
-      "geoName": "Tripura East",
-      "pcNo": 2
-    },
-    "Uttar Pradesh|AKBARPUR": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "AKBARPUR",
-      "state": "Uttar Pradesh",
-      "geoName": "Akbarpur",
-      "pcNo": 44
-    },
-    "Uttar Pradesh|KAISERGANJ": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "KAISERGANJ",
-      "state": "Uttar Pradesh",
-      "geoName": "Kaiserganj",
-      "pcNo": 57
-    },
-    "Uttar Pradesh|LALGANJ": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "LALGANJ (SC)",
-      "state": "Uttar Pradesh",
-      "geoName": "Lalganj",
-      "pcNo": 68
-    },
-    "Uttar Pradesh|MATHURA": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "MATHURA",
-      "state": "Uttar Pradesh",
-      "geoName": "Mathura",
-      "pcNo": 17
-    },
-    "Uttar Pradesh|MIRZAPUR": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "MIRZAPUR",
-      "state": "Uttar Pradesh",
-      "geoName": "Mirzapur",
-      "pcNo": 79
-    },
-    "Uttar Pradesh|NAGINA": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "NAGINA (SC)",
-      "state": "Uttar Pradesh",
-      "geoName": "Nagina",
-      "pcNo": 5
-    },
-    "Uttar Pradesh|RAE BARELI": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "RAE BARELI",
-      "state": "Uttar Pradesh",
-      "geoName": "Rae Bareli",
-      "pcNo": 36
-    },
-    "West Bengal|DUM DUM": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "DUM DUM",
-      "state": "West Bengal",
-      "geoName": "Dum Dum",
-      "pcNo": 16
-    },
-    "West Bengal|HOWRAH": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "HOWRAH",
-      "state": "West Bengal",
-      "geoName": "Howrah",
-      "pcNo": 25
-    },
-    "West Bengal|KOLKATA DAKSHIN": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "KOLKATA DAKSHIN",
-      "state": "West Bengal",
-      "geoName": "Kolkata Dakshin",
-      "pcNo": 23
-    },
-    "West Bengal|SREERAMPUR": {
-      "status": "matched",
-      "method": "exact",
-      "score": 1,
-      "lsConstituency": "SREERAMPUR",
-      "state": "West Bengal",
-      "geoName": "Sreerampur",
-      "pcNo": 27
     }
   }
 }

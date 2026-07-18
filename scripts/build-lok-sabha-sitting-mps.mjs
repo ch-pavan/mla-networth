@@ -7,52 +7,79 @@ function moneyValue(value, status) {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
+const REVIEWED_WINNER_STATE_OVERRIDES = new Map([
+  [1702, { name: "Abhay Kumar Sinha", state: "Bihar" }],
+  [8177, { name: "Janardan Singh (Sigriwal)", state: "Bihar" }],
+  [8760, { name: "Anurag Singh Thakur", state: "Himachal Pradesh" }],
+]);
+
 const winners = JSON.parse(await readFile("public/data/lok-sabha-winner-archive.json", "utf8"));
+const candidates = JSON.parse(await readFile("public/data/candidates/loksabha2024.json", "utf8"));
 const latestYear = Math.max(...winners.records.map((record) => record.electionYear));
-const sitting = winners.records
+if (latestYear !== 2024 || candidates.meta.electionYear !== latestYear || candidates.meta.complete !== true) {
+  throw new Error("Expected the complete LokSabha2024 candidate shard before building the winner snapshot");
+}
+
+const candidatesById = new Map(candidates.records.map((record) => [record.candidateId, record]));
+const electionWinners = winners.records
   .filter((record) => record.electionYear === latestYear && record.electionType !== "by-election")
-  .map((record) => ({
-    record,
-    assets: moneyValue(record.assets, record.assetsStatus),
-  }))
+  .map((winner) => {
+    const candidate = candidatesById.get(winner.candidateId);
+    if (!candidate) throw new Error(`Winner ${winner.candidateId} is absent from the complete candidate shard`);
+    if (candidate.normalizedName !== winner.normalizedName) {
+      throw new Error(`Winner/candidate identity mismatch for candidate ${winner.candidateId}`);
+    }
+    return { winner, candidate, assets: moneyValue(candidate.assets, candidate.assetsStatus) };
+  })
   .sort((left, right) => {
     if (left.assets === null) return right.assets === null ? 0 : 1;
     if (right.assets === null) return -1;
-    return right.assets - left.assets || left.record.candidateId - right.record.candidateId;
+    return right.assets - left.assets || left.winner.candidateId - right.winner.candidateId;
   });
 
-const records = sitting.map((entry, index) => ({
+const records = electionWinners.map((entry, index) => ({
   rank: index + 1,
-  state: entry.record.state,
-  electionYear: entry.record.electionYear,
-  constituency: entry.record.baseConstituency || entry.record.constituency,
-  name: entry.record.name,
-  party: entry.record.party,
+  state: (() => {
+    const reviewed = REVIEWED_WINNER_STATE_OVERRIDES.get(entry.winner.candidateId);
+    if (reviewed && reviewed.name !== entry.candidate.name) {
+      throw new Error(`Reviewed state override identity mismatch for candidate ${entry.winner.candidateId}`);
+    }
+    return reviewed?.state ?? entry.winner.state;
+  })(),
+  electionYear: entry.winner.electionYear,
+  electionType: "general",
+  recordType: "general_election_winner",
+  constituency: entry.winner.baseConstituency || entry.winner.constituency,
+  name: entry.candidate.name,
+  party: entry.candidate.party,
   age: null,
-  gender: "",
+  gender: null,
   assets: entry.assets,
-  liabilities: moneyValue(entry.record.liabilities, entry.record.liabilitiesStatus),
-  criminalCases: entry.record.criminalCases,
-  seriousCriminalCases: 0,
-  education: entry.record.education,
-  panDeclared: false,
+  liabilities: moneyValue(entry.candidate.liabilities, entry.candidate.liabilitiesStatus),
+  criminalCases: entry.candidate.criminalCases,
+  seriousCriminalCases: null,
+  education: entry.candidate.education,
+  panDeclared: null,
   chamber: "lok_sabha",
-  electionFolder: entry.record.electionFolder,
-  candidateId: entry.record.candidateId,
-  candidateUrl: entry.record.candidateUrl,
+  electionFolder: entry.winner.electionFolder,
+  candidateId: entry.winner.candidateId,
+  candidateUrl: entry.candidate.candidateUrl,
 }));
 
 const payload = {
   meta: {
-    title: `Sitting Lok Sabha MPs from MyNeta winners · ${latestYear}`,
+    title: `Lok Sabha ${latestYear} general-election winners — affidavit snapshot`,
     chamber: "lok_sabha",
+    datasetType: "general_election_winners",
     publisher: "Association for Democratic Reforms / MyNeta",
     published: String(latestYear),
     sourceUrl: `https://www.myneta.info/LokSabha${latestYear}/`,
     primarySource: "Election Commission of India candidate affidavits via MyNeta winner summaries",
     extractedAt: new Date().toISOString(),
     recordCount: records.length,
-    note: "Derived from Lok Sabha general-election winners in the NetaWorth winner archive. Assets and liabilities are affidavit declarations, not audited market wealth. Age, gender, PAN and serious-case fields are not present on winner summaries and remain blank.",
+    candidateArchiveFile: "/data/candidates/loksabha2024.json",
+    candidateArchiveCrossCheckComplete: true,
+    note: "The 543 winners declared after the 2024 Lok Sabha general election, enriched from the complete LokSabha2024 candidate-affidavit shard. This is an election-result snapshot, not a claim about current or sitting membership. Assets and liabilities are self-declared, not audited market wealth. Age, gender, PAN and serious-case values are unavailable in this archive and remain null.",
   },
   records,
 };

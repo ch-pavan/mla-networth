@@ -13,7 +13,7 @@ type AdrRecord = {
   constituency: string;
   name: string;
   party: string;
-  assets: number;
+  assets: number | null;
   electionFolder?: string;
   candidateId?: number;
   candidateUrl?: string;
@@ -47,7 +47,7 @@ function recordsToSeats(
     constituency: record.constituency || (chamber === "rajya_sabha" ? "Rajya Sabha" : record.constituency),
     name: record.name,
     party: record.party,
-    assets: record.assets ?? 0,
+    assets: typeof record.assets === "number" && Number.isFinite(record.assets) ? record.assets : null,
     chamber,
     electionFolder: record.electionFolder,
     candidateId: record.candidateId,
@@ -62,7 +62,11 @@ function buildSeatsByState(seats: ChamberSeat[]): Record<string, ChamberSeat[]> 
     (map[seat.state] ??= []).push(seat);
   }
   for (const list of Object.values(map)) {
-    list.sort((a, b) => b.assets - a.assets);
+    list.sort((a, b) => {
+      if (a.assets === null) return b.assets === null ? a.name.localeCompare(b.name) : 1;
+      if (b.assets === null) return -1;
+      return b.assets - a.assets;
+    });
   }
   return map;
 }
@@ -70,16 +74,26 @@ function buildSeatsByState(seats: ChamberSeat[]): Record<string, ChamberSeat[]> 
 function buildAggregates(seatsByState: Record<string, ChamberSeat[]>, withBreakdown = false): StateAggregate[] {
   return Object.entries(seatsByState)
     .map(([state, seats]) => {
-      const byChamber = { assembly: 0, lok_sabha: 0, rajya_sabha: 0 };
+      const byChamber: NonNullable<StateAggregate["byChamber"]> = {
+        assembly: { totalAssets: 0, count: 0, knownCount: 0 },
+        lok_sabha: { totalAssets: 0, count: 0, knownCount: 0 },
+        rajya_sabha: { totalAssets: 0, count: 0, knownCount: 0 },
+      };
       let totalAssets = 0;
+      let knownCount = 0;
       for (const seat of seats) {
+        byChamber[seat.chamber].count += 1;
+        if (seat.assets === null) continue;
         totalAssets += seat.assets;
-        byChamber[seat.chamber] += seat.assets;
+        knownCount += 1;
+        byChamber[seat.chamber].totalAssets += seat.assets;
+        byChamber[seat.chamber].knownCount += 1;
       }
       return {
         state,
         totalAssets,
         count: seats.length,
+        knownCount,
         ...(withBreakdown ? { byChamber } : {}),
       };
     })
@@ -121,10 +135,6 @@ export default function MapPage() {
     return () => controller.abort();
   }, []);
 
-  useEffect(() => {
-    setActiveState(null);
-  }, [mapView]);
-
   const mlaSeats = useMemo(
     () => recordsToSeats(mlaSnapshot?.records, "assembly", mlaSnapshot?.meta.sourceUrl),
     [mlaSnapshot],
@@ -154,6 +164,10 @@ export default function MapPage() {
     () => stateAggregates.reduce((sum, row) => sum + row.totalAssets, 0),
     [stateAggregates],
   );
+  const nationalKnownCount = useMemo(
+    () => stateAggregates.reduce((sum, row) => sum + row.knownCount, 0),
+    [stateAggregates],
+  );
 
   const panelSeats = activeState ? (seatsByState[activeState] ?? []).slice(0, 40) : [];
   const selectedAggregate = activeState
@@ -163,8 +177,8 @@ export default function MapPage() {
   const heroCopy = (() => {
     if (mapView === "aggregate") {
       return activeState
-        ? "Declared assets from sitting MLAs, Lok Sabha MPs and Rajya Sabha MPs in this state."
-        : "States are colored by the sum of declared assets across all three houses. Tap a state for the breakdown.";
+        ? "Declared assets from the sitting-MLA and analyzed Rajya Sabha datasets, plus 2024 Lok Sabha general-election winners, in this state."
+        : "States are colored by the sum of declared assets across all three datasets. Tap a state for the breakdown.";
     }
     if (mapView === "assembly") {
       return activeState
@@ -173,12 +187,12 @@ export default function MapPage() {
     }
     if (mapView === "lok_sabha") {
       return activeState
-        ? "Each parliamentary constituency is colored by that sitting MP’s declared assets."
-        : "States are colored by Lok Sabha MP declared assets. Tap a state to open constituencies.";
+        ? "Each parliamentary constituency is colored by that 2024 general-election winner’s declared assets."
+        : "States are colored by declared assets from 2024 Lok Sabha general-election winners. Tap a state to open constituencies.";
     }
     return activeState
-      ? "Rajya Sabha MPs nominated from this state, ranked by declared assets."
-      : "States are colored by Rajya Sabha MP declared assets. Tap a state to list MPs.";
+      ? "Analyzed Rajya Sabha MPs from this state, ranked by declared assets."
+      : "States are colored by declared assets from ADR’s 229 analyzed Rajya Sabha MPs. Tap a state to list records.";
   })();
 
   const recordCount = mapView === "assembly"
@@ -194,6 +208,9 @@ export default function MapPage() {
   const openSeat = (seat: SeatRow) => {
     window.location.assign(seatHref(seat as ChamberSeat));
   };
+  const displayAssets = (value: number | null) => value === null ? "Not available" : formatRupees(value);
+  const selectedAssets = selectedAggregate?.knownCount ? formatRupees(selectedAggregate.totalAssets) : "Not available";
+  const nationalAssets = nationalKnownCount ? formatRupees(nationalTotal) : "Not available";
 
   return (
     <>
@@ -213,20 +230,24 @@ export default function MapPage() {
           <span className="sectionNo">MAP / AGGREGATE WEALTH</span>
           <h1>{activeState ? activeState : "India"}</h1>
           <p>{heroCopy}</p>
-          <div className="chamberSwitch" role="tablist" aria-label="Map view">
-            <button type="button" role="tab" aria-selected={mapView === "aggregate"} className={mapView === "aggregate" ? "active" : ""} onClick={() => setMapView("aggregate")}>Aggregate</button>
-            <button type="button" role="tab" aria-selected={mapView === "assembly"} className={mapView === "assembly" ? "active" : ""} onClick={() => setMapView("assembly")}>Assemblies</button>
-            <button type="button" role="tab" aria-selected={mapView === "lok_sabha"} className={mapView === "lok_sabha" ? "active" : ""} onClick={() => setMapView("lok_sabha")}>Lok Sabha</button>
-            <button type="button" role="tab" aria-selected={mapView === "rajya_sabha"} className={mapView === "rajya_sabha" ? "active" : ""} onClick={() => setMapView("rajya_sabha")}>Rajya Sabha</button>
+          <div className="chamberSwitch" role="group" aria-label="Map view">
+            <button type="button" aria-pressed={mapView === "aggregate"} className={mapView === "aggregate" ? "active" : ""} onClick={() => setMapView("aggregate")}>Aggregate</button>
+            <button type="button" aria-pressed={mapView === "assembly"} className={mapView === "assembly" ? "active" : ""} onClick={() => setMapView("assembly")}>Assemblies</button>
+            <button type="button" aria-pressed={mapView === "lok_sabha"} className={mapView === "lok_sabha" ? "active" : ""} onClick={() => setMapView("lok_sabha")}>Lok Sabha</button>
+            <button type="button" aria-pressed={mapView === "rajya_sabha"} className={mapView === "rajya_sabha" ? "active" : ""} onClick={() => setMapView("rajya_sabha")}>Rajya Sabha</button>
           </div>
           <div className="mapHeroStats">
             <div>
-              <b>{recordCount != null ? formatRupees(activeState ? (selectedAggregate?.totalAssets ?? 0) : nationalTotal) : "—"}</b>
+              <b>{recordCount != null ? (activeState ? selectedAssets : nationalAssets) : "—"}</b>
               <small>{activeState ? "state aggregate assets" : "national aggregate assets"}</small>
             </div>
             <div>
               <b>{activeState ? (seatsByState[activeState]?.length ?? 0) : (recordCount ?? "—")}</b>
               <small>{activeState ? "records in view" : "records indexed"}</small>
+            </div>
+            <div>
+              <b>{activeState ? (selectedAggregate?.knownCount ?? 0) : nationalKnownCount}</b>
+              <small>asset amounts available</small>
             </div>
           </div>
         </section>
@@ -245,7 +266,15 @@ export default function MapPage() {
 
           <aside className="mapRanks" aria-label={activeState ? "Seat ranking" : "State ranking"}>
             <header>
-              <span>{activeState ? (mapView === "aggregate" ? "HOUSE BREAKDOWN" : "CONSTITUENCIES / MPS") : "STATES BY TOTAL ASSETS"}</span>
+              <span>{activeState
+                ? mapView === "aggregate"
+                  ? "DATASET BREAKDOWN"
+                  : mapView === "lok_sabha"
+                    ? "CONSTITUENCIES / 2024 WINNERS"
+                    : mapView === "assembly"
+                      ? "CONSTITUENCIES / MLAS"
+                      : "RAJYA SABHA MPS"
+                : "STATES BY TOTAL ASSETS"}</span>
               <h2>{activeState ? activeState : "Where the pile sits"}</h2>
             </header>
             {activeState && mapView === "aggregate" && selectedAggregate?.byChamber ? (
@@ -254,15 +283,15 @@ export default function MapPage() {
                   ["assembly", "State assemblies", selectedAggregate.byChamber.assembly],
                   ["lok_sabha", "Lok Sabha", selectedAggregate.byChamber.lok_sabha],
                   ["rajya_sabha", "Rajya Sabha", selectedAggregate.byChamber.rajya_sabha],
-                ] as const).map(([key, label, assets], index) => (
+                ] as const).map(([key, label, chamber], index) => (
                   <li key={key}>
                     <button type="button" onClick={() => setMapView(key)}>
                       <span>{String(index + 1).padStart(2, "0")}</span>
                       <div>
                         <b>{label}</b>
-                        <small>Open {label.toLowerCase()} map</small>
+                        <small>{chamber.knownCount.toLocaleString("en-IN")} of {chamber.count.toLocaleString("en-IN")} amounts · open map</small>
                       </div>
-                      <em>{formatRupees(assets)}</em>
+                      <em>{chamber.knownCount ? formatRupees(chamber.totalAssets) : "Not available"}</em>
                     </button>
                   </li>
                 ))}
@@ -274,13 +303,13 @@ export default function MapPage() {
                         <b>{seat.name}</b>
                         <small>{seat.chamber === "assembly" ? "MLA" : seat.chamber === "lok_sabha" ? "LS" : "RS"} · {seat.constituency} · {seat.party}</small>
                       </div>
-                      <em>{formatRupees(seat.assets)}</em>
+                      <em>{displayAssets(seat.assets)}</em>
                     </button>
                   </li>
                 ))}
               </ol>
             ) : activeState ? (
-              <ol>
+              panelSeats.length ? <ol>
                 {panelSeats.map((seat, index) => (
                   <li key={`${seat.chamber}-${seat.rank}-${seat.constituency}`}>
                     <button type="button" onClick={() => openSeat(seat)}>
@@ -289,11 +318,15 @@ export default function MapPage() {
                         <b>{seat.constituency}</b>
                         <small>{seat.name} · {seat.party}</small>
                       </div>
-                      <em>{formatRupees(seat.assets)}</em>
+                      <em>{displayAssets(seat.assets)}</em>
                     </button>
                   </li>
                 ))}
-              </ol>
+              </ol> : <div className="mapRanksEmpty">
+                <b>No records in this view</b>
+                <p>{activeState} stays selected while you switch houses.</p>
+                <button type="button" onClick={() => setActiveState(null)}>Return to All India</button>
+              </div>
             ) : (
               <ol>
                 {stateAggregates.map((row, index) => (
@@ -302,9 +335,9 @@ export default function MapPage() {
                       <span>{String(index + 1).padStart(2, "0")}</span>
                       <div>
                         <b>{row.state}</b>
-                        <small>{row.count.toLocaleString("en-IN")} records</small>
+                        <small>{row.knownCount.toLocaleString("en-IN")} of {row.count.toLocaleString("en-IN")} amounts</small>
                       </div>
-                      <em>{formatRupees(row.totalAssets)}</em>
+                      <em>{row.knownCount ? formatRupees(row.totalAssets) : "Not available"}</em>
                     </button>
                   </li>
                 ))}

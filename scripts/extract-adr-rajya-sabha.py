@@ -17,6 +17,12 @@ SOURCE_URL = (
     "Sitting_Rajya_Sabha_MPs_March2026_Eng_0.pdf"
 )
 
+STATE_ALIASES = {
+    "Chattisgarh": "Chhattisgarh",
+    "Jammu And Kashmir": "Jammu and Kashmir",
+    "NCT Of Delhi": "Delhi",
+}
+
 
 def money(value) -> int | None:
     if value is None:
@@ -30,6 +36,11 @@ def money(value) -> int | None:
 
 def clean(value) -> str:
     return re.sub(r"\s+", " ", (value or "").replace("\n", " ")).strip()
+
+
+def canonical_state(value: str) -> str:
+    state = clean(value)
+    return STATE_ALIASES.get(state, state)
 
 
 def parse_term(value: str) -> tuple[str | None, int | None, int | None]:
@@ -62,7 +73,7 @@ def extract_asset_rows(pdf_path: Path) -> list[dict]:
                         {
                             "rank": int(sno),
                             "name": clean(raw[1]),
-                            "state": clean(raw[2]),
+                            "state": canonical_state(raw[2]),
                             "term": term_label,
                             "termFrom": term_from,
                             "termTo": term_to,
@@ -74,8 +85,8 @@ def extract_asset_rows(pdf_path: Path) -> list[dict]:
                             "immovableAssets": money(raw[7]),
                             "assets": money(raw[8]),
                             "liabilities": None,
-                            "criminalCases": 0,
-                            "seriousCriminalCases": 0,
+                            "criminalCases": None,
+                            "seriousCriminalCases": None,
                             "education": "",
                             "panDeclared": clean(raw[9]).upper().startswith("Y") if len(raw) > 9 else False,
                             "constituency": "Rajya Sabha",
@@ -115,8 +126,6 @@ def attach_top_liabilities(pdf_path: Path, records: list[dict]) -> int:
         if amount is not None:
             record["liabilities"] = amount
             attached += 1
-        else:
-            record["liabilities"] = 0
     return attached
 
 
@@ -133,18 +142,25 @@ def main() -> None:
             "title": "Sitting Rajya Sabha MPs — ADR analysis, March 2026",
             "chamber": "rajya_sabha",
             "publisher": "Association for Democratic Reforms",
-            "published": "2026-03-17",
+            "asOf": "2026-03-17",
+            "published": "2026-03-19",
             "sourceUrl": SOURCE_URL,
             "primarySource": "Election Commission of India candidate affidavits",
             "sourceSha256": hashlib.sha256(pdf_path.read_bytes()).hexdigest(),
             "extractedAt": datetime.now(timezone.utc).isoformat(),
             "recordCount": len(records),
+            "sittingMps": 233,
+            "analyzedRecords": 229,
+            "vacantSeats": 1,
+            "affidavitsUnavailable": 3,
             "liabilityMatchesFromTopTable": liability_matches,
             "note": (
                 "Self-declared affidavit values from ADR's March 2026 sitting Rajya Sabha report. "
                 "Not independently audited market wealth. Full liabilities are not published for every MP "
                 f"in the appendix; only {liability_matches} names were matched from the top-liabilities table, "
-                "and unmatched liabilities are treated as 0 for net-worth display."
+                "while unmatched liabilities and case counts remain null. ADR analyzed 229 of 233 "
+                "sitting MPs as of 17 March 2026; one seat was vacant and affidavits for three MPs "
+                "were unavailable. The report was published on 19 March 2026."
             ),
         },
         "records": records,

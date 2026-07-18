@@ -44,6 +44,12 @@ const normalize = (value) => value
   .trim()
   .toLowerCase();
 
+const REVIEWED_LOK_SABHA_STATE_OVERRIDES = new Map([
+  ["loksabha2024|1702", { name: "Abhay Kumar Sinha", state: "Bihar" }],
+  ["loksabha2024|8177", { name: "Janardan Singh (Sigriwal)", state: "Bihar" }],
+  ["loksabha2024|8760", { name: "Anurag Singh Thakur", state: "Himachal Pradesh" }],
+]);
+
 function winnerSummaryUrl(election, page) {
   return summaryUrl(election, page, {
     sort: "asset",
@@ -208,11 +214,18 @@ const records = parsedRecords.map((winner) => {
     : reconcileWinnerMoney(winner, candidate);
   if (!lokSabhaOnly) return reconciled;
   const geography = constituencyStateMaps.get(winner.electionFolder.toLowerCase()) ?? new Map();
+  const reviewedState = REVIEWED_LOK_SABHA_STATE_OVERRIDES.get(
+    `${winner.electionFolder.toLowerCase()}|${winner.candidateId}`,
+  );
+  if (reviewedState && reviewedState.name !== winner.name) {
+    throw new Error(`Reviewed state override identity mismatch for ${winner.electionFolder}/${winner.candidateId}`);
+  }
   return {
     ...reconciled,
     chamber: "lok_sabha",
     house: "Lok Sabha",
-    state: resolveLokSabhaState(reconciled.baseConstituency || reconciled.constituency, geography),
+    state: reviewedState?.state
+      ?? resolveLokSabhaState(reconciled.baseConstituency || reconciled.constituency, geography),
   };
 });
 records.sort(

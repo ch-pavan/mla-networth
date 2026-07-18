@@ -2,7 +2,7 @@
 
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 import { geoMercator, geoPath } from "d3-geo";
-import { scaleLinear } from "d3-scale";
+import { scaleQuantile } from "d3-scale";
 import { useEffect, useMemo, useState } from "react";
 import { feature } from "topojson-client";
 import type { Topology } from "topojson-specification";
@@ -32,7 +32,7 @@ export type SeatRow = {
   constituency: string;
   name: string;
   party: string;
-  assets: number;
+  assets: number | null;
   chamber?: "assembly" | "lok_sabha" | "rajya_sabha";
   electionFolder?: string;
   candidateId?: number;
@@ -44,7 +44,12 @@ export type StateAggregate = {
   state: string;
   totalAssets: number;
   count: number;
-  byChamber?: { assembly: number; lok_sabha: number; rajya_sabha: number };
+  knownCount: number;
+  byChamber?: Record<"assembly" | "lok_sabha" | "rajya_sabha", {
+    totalAssets: number;
+    count: number;
+    knownCount: number;
+  }>;
 };
 
 type MatchIndex = { byKey: Record<string, string> };
@@ -55,8 +60,8 @@ type HoverInfo = {
   title: string;
   subtitle: string;
   value: string;
-  x: number;
-  y: number;
+  coverage: string;
+  context?: string;
 };
 
 type Props = {
@@ -68,14 +73,38 @@ type Props = {
   onSelectSeat: (seat: SeatRow) => void;
 };
 
+const MAP_COLORS = ["#d9e4dc", "#b8d5c5", "#edcf91", "#e68b4f", "#bd4a20"];
+
+const STATE_LABEL_TREATMENTS: Record<string, { label?: string; dx?: number; dy?: number }> = {
+  Bihar: { dx: -8, dy: -7 },
+  Jharkhand: { dx: -18, dy: 7 },
+  "West Bengal": { label: "W. Bengal", dx: 22, dy: 18 },
+};
+
 function colorScale(values: number[]) {
   const finite = values.filter((v) => Number.isFinite(v) && v > 0);
-  const max = finite.length ? Math.max(...finite) : 1;
-  const min = finite.length ? Math.min(...finite) : 0;
-  return scaleLinear<string, string>()
-    .domain([min, (min + max) / 2, max])
-    .range(["#f3e4cf", "#e39a52", "#b24512"])
-    .clamp(true);
+  return scaleQuantile<string>()
+    .domain(finite.length ? finite : [0])
+    .range(MAP_COLORS);
+}
+
+function amountLabel(value: number | null): string {
+  return value === null ? "Amount unavailable" : formatRupees(value);
+}
+
+function pcFeatureState(properties: AcProps | null | undefined): string {
+  // The community PC topology predates Ladakh's separate UT label; PC 4 is the Ladakh seat.
+  if (normalizeConstituencyName(String(properties?.pc_name ?? "")) === "LADAKH") return "Ladakh";
+  return toMapStateName(String(properties?.st_name ?? ""));
+}
+
+function legendLabels(thresholds: number[], hasValues: boolean): string[] {
+  return MAP_COLORS.map((_, index) => {
+    if (!hasValues || !thresholds.length) return "No values";
+    if (index === 0) return `≤ ${formatRupees(thresholds[0])}`;
+    if (index === MAP_COLORS.length - 1) return `> ${formatRupees(thresholds.at(-1) ?? 0)}`;
+    return `${formatRupees(thresholds[index - 1])}–${formatRupees(thresholds[index])}`;
+  });
 }
 
 export default function IndiaMap({
@@ -87,18 +116,17 @@ export default function IndiaMap({
   onSelectSeat,
 }: Props) {
   const [statesTopo, setStatesTopo] = useState<Topology | null>(null);
-  const [acTopo, setAcTopo] = useState<Topology | null>(null);
-  const [pcTopo, setPcTopo] = useState<Topology | null>(null);
+  const [seatLayer, setSeatLayer] = useState<{ key: string; topology?: Topology; error?: string } | null>(null);
   const [acIndex, setAcIndex] = useState<AcIndex | null>(null);
   const [pcIndex, setPcIndex] = useState<PcIndex | null>(null);
   const [acMatchIndex, setAcMatchIndex] = useState<MatchIndex | null>(null);
   const [pcMatchIndex, setPcMatchIndex] = useState<MatchIndex | null>(null);
   const [loadError, setLoadError] = useState("");
-  const [seatError, setSeatError] = useState("");
   const [hover, setHover] = useState<HoverInfo | null>(null);
 
   const drillMode = mapView === "assembly" || mapView === "lok_sabha";
   const showSeatLayer = Boolean(activeState && drillMode);
+  const inspectionContext = `${mapView}:${activeState ?? "india"}`;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -137,33 +165,31 @@ export default function IndiaMap({
     return () => controller.abort();
   }, []);
 
+  const assemblyGeoEntry = useMemo(() => {
+    if (!activeState || !acIndex) return null;
+    const direct = acIndex.states[activeState] ?? acIndex.states[toMapStateName(activeState)];
+    // AC index uses ADR names (Jammu Kashmir); map state uses Jammu and Kashmir.
+    const adrKey = Object.keys(acIndex.states).find((key) => toMapStateName(key) === toMapStateName(activeState));
+    return direct ?? (adrKey ? acIndex.states[adrKey] : null) ?? null;
+  }, [activeState, acIndex]);
+
   useEffect(() => {
-    setAcTopo(null);
-    setPcTopo(null);
-    setSeatError("");
     if (!activeState || !drillMode) return;
+    const key = `${mapView}:${activeState}`;
 
     if (mapView === "assembly") {
-      if (!acIndex) return;
-      const entry = acIndex.states[activeState] ?? acIndex.states[toMapStateName(activeState)];
-      // AC index uses ADR names (Jammu Kashmir); map state uses Jammu and Kashmir.
-      const adrKey = Object.keys(acIndex.states).find((key) => toMapStateName(key) === toMapStateName(activeState));
-      const resolved = entry ?? (adrKey ? acIndex.states[adrKey] : null);
-      if (!resolved) {
-        setSeatError(`No assembly constituency boundaries for ${activeState}`);
-        return;
-      }
+      if (!assemblyGeoEntry) return;
       const controller = new AbortController();
-      void fetch(publicUrl(`/data/geo/${resolved.file}`), { signal: controller.signal })
+      void fetch(publicUrl(`/data/geo/${assemblyGeoEntry.file}`), { signal: controller.signal })
         .then((r) => {
           if (!r.ok) throw new Error(`Constituency map failed (${r.status})`);
           return r.json();
         })
         .then((topo) => {
-          if (!controller.signal.aborted) setAcTopo(topo as Topology);
+          if (!controller.signal.aborted) setSeatLayer({ key, topology: topo as Topology });
         })
         .catch((error: unknown) => {
-          if (!controller.signal.aborted) setSeatError(error instanceof Error ? error.message : "Constituency map unavailable");
+          if (!controller.signal.aborted) setSeatLayer({ key, error: error instanceof Error ? error.message : "Constituency map unavailable" });
         });
       return () => controller.abort();
     }
@@ -177,14 +203,22 @@ export default function IndiaMap({
           return r.json();
         })
         .then((topo) => {
-          if (!controller.signal.aborted) setPcTopo(topo as Topology);
+          if (!controller.signal.aborted) setSeatLayer({ key, topology: topo as Topology });
         })
         .catch((error: unknown) => {
-          if (!controller.signal.aborted) setSeatError(error instanceof Error ? error.message : "PC map unavailable");
+          if (!controller.signal.aborted) setSeatLayer({ key, error: error instanceof Error ? error.message : "PC map unavailable" });
         });
       return () => controller.abort();
     }
-  }, [activeState, acIndex, pcIndex, mapView, drillMode]);
+  }, [activeState, assemblyGeoEntry, pcIndex, mapView, drillMode]);
+
+  const seatLayerKey = activeState && drillMode ? `${mapView}:${activeState}` : null;
+  const loadedSeatTopology = seatLayerKey && seatLayer?.key === seatLayerKey ? seatLayer.topology ?? null : null;
+  const seatError = mapView === "assembly" && activeState && acIndex && !assemblyGeoEntry
+    ? `No assembly constituency boundaries for ${activeState}`
+    : seatLayerKey && seatLayer?.key === seatLayerKey
+      ? seatLayer.error ?? ""
+      : "";
 
   const stateTotals = useMemo(() => {
     const map = new Map(stateAggregates.map((s) => [toMapStateName(s.state), s]));
@@ -217,7 +251,7 @@ export default function IndiaMap({
   }, [activeState, showSeatLayer, seatsByState, mapView, acMatchIndex, pcMatchIndex]);
 
   const seatFill = useMemo(() => {
-    const values = [...seatLookup.values()].map((s) => s.assets);
+    const values = [...seatLookup.values()].flatMap((s) => s.assets === null ? [] : [s.assets]);
     return colorScale(values);
   }, [seatLookup]);
 
@@ -225,20 +259,28 @@ export default function IndiaMap({
     if (!statesTopo) return [];
     const fc = asFeatureCollection<StateProps>(statesTopo, "states");
     if (!fc) return [];
-    const projection = geoMercator().fitSize([900, 900], fc);
+    const projection = geoMercator().fitExtent([[70, 24], [830, 736]], fc);
     const path = geoPath(projection);
     return fc.features.map((f: Feature<Geometry, StateProps>, i: number) => {
       const geoName = String(f.properties?.st_nm ?? "");
       const mapState = toMapStateName(geoName);
       const agg = stateTotals.get(mapState);
+      const labelTreatment = STATE_LABEL_TREATMENTS[mapState];
       return {
         id: `${mapState}-${i}`,
         mapState,
         d: path(f) ?? "",
         hasData: Boolean(agg),
-        fill: agg ? stateFill(agg.totalAssets) : "#e8e2d6",
+        hasAmount: Boolean(agg?.knownCount),
+        fill: agg?.knownCount ? stateFill(agg.totalAssets) : "url(#mapUnknown)",
         totalAssets: agg?.totalAssets ?? 0,
         count: agg?.count ?? 0,
+        knownCount: agg?.knownCount ?? 0,
+        centroid: path.centroid(f),
+        area: path.area(f),
+        label: labelTreatment?.label ?? mapState.replace(" and ", " & "),
+        labelDx: labelTreatment?.dx ?? 0,
+        labelDy: labelTreatment?.dy ?? 0,
       };
     });
   }, [statesTopo, stateFill, stateTotals]);
@@ -246,15 +288,15 @@ export default function IndiaMap({
   const seatPaths = useMemo(() => {
     if (!activeState || !showSeatLayer) return [];
 
-    if (mapView === "assembly" && acTopo) {
-      const layerKey = acTopo.objects.constituencies ? "constituencies" : Object.keys(acTopo.objects)[0];
-      const fc = asFeatureCollection<AcProps>(acTopo, layerKey);
+    if (mapView === "assembly" && loadedSeatTopology) {
+      const layerKey = loadedSeatTopology.objects.constituencies ? "constituencies" : Object.keys(loadedSeatTopology.objects)[0];
+      const fc = asFeatureCollection<AcProps>(loadedSeatTopology, layerKey);
       if (!fc) return [];
       const adrKey = acIndex
         ? Object.keys(acIndex.states).find((key) => toMapStateName(key) === toMapStateName(activeState))
         : undefined;
       const shared = Boolean(adrKey && acIndex?.states[adrKey]?.sharedFrom);
-      const projection = geoMercator().fitSize([900, 900], fc);
+      const projection = geoMercator().fitExtent([[60, 30], [840, 730]], fc);
       const path = geoPath(projection);
       return fc.features.flatMap((f: Feature<Geometry, AcProps>, i: number) => {
         const rawName = String(f.properties?.name ?? "");
@@ -266,21 +308,21 @@ export default function IndiaMap({
           name: rawName,
           d: path(f) ?? "",
           seat,
-          fill: seat ? seatFill(seat.assets) : "#ebe4d8",
+          fill: seat?.assets != null ? seatFill(seat.assets) : "url(#mapUnknown)",
         }];
       });
     }
 
-    if (mapView === "lok_sabha" && pcTopo && pcIndex) {
-      const fc = asFeatureCollection<AcProps>(pcTopo, pcIndex.meta.objectName);
+    if (mapView === "lok_sabha" && loadedSeatTopology && pcIndex) {
+      const fc = asFeatureCollection<AcProps>(loadedSeatTopology, pcIndex.meta.objectName);
       if (!fc) return [];
       const targetState = toMapStateName(activeState);
       const filtered = {
         type: "FeatureCollection" as const,
-        features: fc.features.filter((f) => toMapStateName(String(f.properties?.st_name ?? "")) === targetState),
+        features: fc.features.filter((f) => pcFeatureState(f.properties) === targetState),
       };
       if (!filtered.features.length) return [];
-      const projection = geoMercator().fitSize([900, 900], filtered);
+      const projection = geoMercator().fitExtent([[60, 30], [840, 730]], filtered);
       const path = geoPath(projection);
       return filtered.features.map((f: Feature<Geometry, AcProps>, i: number) => {
         const rawName = String(f.properties?.pc_name ?? "");
@@ -291,15 +333,15 @@ export default function IndiaMap({
           name: rawName,
           d: path(f) ?? "",
           seat,
-          fill: seat ? seatFill(seat.assets) : "#ebe4d8",
+          fill: seat?.assets != null ? seatFill(seat.assets) : "url(#mapUnknown)",
         };
       });
     }
 
     return [];
-  }, [acTopo, pcTopo, pcIndex, acIndex, activeState, showSeatLayer, mapView, seatLookup, seatFill]);
+  }, [loadedSeatTopology, pcIndex, acIndex, activeState, showSeatLayer, mapView, seatLookup, seatFill]);
 
-  const unitLabel = mapView === "lok_sabha" ? "Lok Sabha MPs" : mapView === "rajya_sabha" ? "Rajya Sabha MPs" : mapView === "assembly" ? "sitting MLAs" : "legislators";
+  const unitLabel = mapView === "lok_sabha" ? "2024 Lok Sabha winners" : mapView === "rajya_sabha" ? "Rajya Sabha MPs" : mapView === "assembly" ? "sitting MLAs" : "records";
   const drillHint = mapView === "assembly"
     ? "Tap a state to open assembly constituencies"
     : mapView === "lok_sabha"
@@ -307,6 +349,34 @@ export default function IndiaMap({
       : mapView === "rajya_sabha"
         ? "Tap a state to list Rajya Sabha MPs"
         : "Tap a state for the house breakdown";
+
+  const visibleScale = showSeatLayer ? seatFill : stateFill;
+  const visibleValueCount = showSeatLayer
+    ? [...seatLookup.values()].filter((seat) => seat.assets !== null).length
+    : stateAggregates.filter((state) => state.knownCount > 0).length;
+  const visibleLegend = legendLabels(visibleScale.quantiles(), visibleValueCount > 0);
+  const selectedStateInfo = activeState ? stateTotals.get(toMapStateName(activeState)) : null;
+  const defaultInfo: HoverInfo = selectedStateInfo
+    ? {
+        title: selectedStateInfo.state,
+        subtitle: `${selectedStateInfo.count.toLocaleString("en-IN")} ${unitLabel}`,
+        value: selectedStateInfo.knownCount ? formatRupees(selectedStateInfo.totalAssets) : "Amount unavailable",
+        coverage: `${selectedStateInfo.knownCount.toLocaleString("en-IN")} of ${selectedStateInfo.count.toLocaleString("en-IN")} declarations include an asset amount`,
+      }
+    : activeState
+      ? {
+          title: activeState,
+          subtitle: `No ${unitLabel} indexed in this view`,
+          value: "Amount unavailable",
+          coverage: "The state selection is preserved. Choose another house or return to All India.",
+        }
+    : {
+        title: "Explore declared wealth",
+        subtitle: drillHint,
+        value: "Five comparable bands",
+        coverage: "Use the map or the ranked list. Keyboard users can tab through mapped regions.",
+      };
+  const inspection = hover?.context === inspectionContext ? hover : defaultInfo;
 
   if (loadError) {
     return <div className="mapCanvas mapEmpty" role="alert">{loadError}</div>;
@@ -321,35 +391,81 @@ export default function IndiaMap({
         {activeState ? (
           <button type="button" className="mapBack" onClick={() => onSelectState(null)}>← All India</button>
         ) : (
-          <span className="mapLevel">INDIA · aggregate declared assets</span>
+          <span className="mapLevel">INDIA · DECLARED ASSET ATLAS</span>
         )}
         <span className="mapLevel">{activeState ? `${activeState} · ${mapView === "lok_sabha" ? "PC" : mapView === "assembly" ? "AC" : "state"} declarations` : drillHint}</span>
       </div>
 
-      <svg viewBox="0 0 900 900" role="img" aria-label={activeState ? `${activeState} wealth map` : "India state wealth map"}>
+      <p id="map-accessibility-hint" className="mapA11yHint">
+        Tab through regions and press Enter or Space to select. Press Escape to return to the India view.
+      </p>
+
+      <div className="mapSvgFrame">
+      <svg
+        viewBox="0 0 900 760"
+        role="group"
+        aria-label={activeState ? `${activeState} declared asset map` : "India state declared asset map"}
+        aria-describedby="map-accessibility-hint"
+        onKeyDown={(event) => {
+          if (event.key !== "Escape" || !activeState) return;
+          event.preventDefault();
+          onSelectState(null);
+        }}
+      >
+        <defs>
+          <pattern id="mapUnknown" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="10" height="10" fill="#31443c" />
+            <line x1="0" y1="0" x2="0" y2="10" stroke="#718077" strokeWidth="3" />
+          </pattern>
+        </defs>
         {(!showSeatLayer || mapView === "rajya_sabha" || mapView === "aggregate") && indiaPaths.map((p) => (
           <path
             key={p.id}
             d={p.d}
             fill={p.fill}
-            className={`mapPath${p.hasData ? "" : " isMuted"}${p.hasData ? " isClickable" : ""}`}
-            onMouseMove={(event) => {
+            className={`mapPath${p.hasData ? "" : " isMuted"}${p.hasData ? " isClickable" : ""}${activeState === p.mapState ? " isSelected" : ""}`}
+            role={p.hasData ? "button" : undefined}
+            tabIndex={p.hasData ? 0 : -1}
+            aria-label={p.hasData ? `${p.mapState}, ${amountLabel(p.hasAmount ? p.totalAssets : null)}, ${p.knownCount} of ${p.count} declarations with amounts` : `${p.mapState}, no mapped declarations`}
+            aria-pressed={p.hasData ? activeState === p.mapState : undefined}
+            onPointerEnter={() => {
               if (!p.hasData) return;
-              const rect = event.currentTarget.ownerSVGElement?.getBoundingClientRect();
               setHover({
                 title: p.mapState,
                 subtitle: `${p.count.toLocaleString("en-IN")} ${unitLabel}`,
-                value: formatRupees(p.totalAssets),
-                x: event.clientX - (rect?.left ?? 0),
-                y: event.clientY - (rect?.top ?? 0),
+                value: amountLabel(p.hasAmount ? p.totalAssets : null),
+                coverage: `${p.knownCount.toLocaleString("en-IN")} of ${p.count.toLocaleString("en-IN")} declarations include an asset amount`,
+                context: inspectionContext,
               });
             }}
-            onMouseLeave={() => setHover(null)}
+            onFocus={() => {
+              if (!p.hasData) return;
+              setHover({
+                title: p.mapState,
+                subtitle: `${p.count.toLocaleString("en-IN")} ${unitLabel}`,
+                value: amountLabel(p.hasAmount ? p.totalAssets : null),
+                coverage: `${p.knownCount.toLocaleString("en-IN")} of ${p.count.toLocaleString("en-IN")} declarations include an asset amount`,
+                context: inspectionContext,
+              });
+            }}
             onClick={() => { if (p.hasData) onSelectState(p.mapState); }}
+            onKeyDown={(event) => {
+              if (!p.hasData || (event.key !== "Enter" && event.key !== " ")) return;
+              event.preventDefault();
+              onSelectState(p.mapState);
+            }}
           >
-            <title>{p.hasData ? `${p.mapState}: ${formatRupees(p.totalAssets)}` : p.mapState}</title>
+            <title>{p.hasData ? `${p.mapState}: ${amountLabel(p.hasAmount ? p.totalAssets : null)}` : p.mapState}</title>
           </path>
         ))}
+
+        {(!showSeatLayer || mapView === "rajya_sabha" || mapView === "aggregate") && indiaPaths
+          .filter((p) => p.hasData && p.area > 1250 && Number.isFinite(p.centroid[0]) && Number.isFinite(p.centroid[1]))
+          .map((p) => (
+            <text key={`${p.id}-label`} x={p.centroid[0] + p.labelDx} y={p.centroid[1] + p.labelDy} textAnchor="middle" className="mapStateLabel" aria-hidden="true">
+              {p.label}
+            </text>
+          ))}
 
         {showSeatLayer && seatError && (
           <text x="450" y="450" textAnchor="middle" className="mapSvgNote">{seatError}</text>
@@ -362,39 +478,58 @@ export default function IndiaMap({
             key={p.id}
             d={p.d}
             fill={p.fill}
-            className={`mapPath${p.seat ? " isClickable" : " isMuted"}`}
-            onMouseMove={(event) => {
-              const rect = event.currentTarget.ownerSVGElement?.getBoundingClientRect();
+            className={`mapPath${p.seat ? " isClickable" : " isUnmatched"}`}
+            role={p.seat ? "button" : undefined}
+            tabIndex={p.seat ? 0 : -1}
+            aria-label={p.seat ? `${p.seat.constituency}, ${p.seat.name}, ${amountLabel(p.seat.assets)}` : `${p.name}, no matched declaration`}
+            onPointerEnter={() => {
               setHover({
                 title: p.seat?.constituency ?? p.name,
-                subtitle: p.seat ? `${p.seat.name} · ${p.seat.party}` : "No matched sitting MP",
-                value: p.seat ? formatRupees(p.seat.assets) : "—",
-                x: event.clientX - (rect?.left ?? 0),
-                y: event.clientY - (rect?.top ?? 0),
+                subtitle: p.seat ? `${p.seat.name} · ${p.seat.party}` : mapView === "assembly" ? "No matched sitting MLA" : "No matched Lok Sabha winner",
+                value: p.seat ? amountLabel(p.seat.assets) : "No matched declaration",
+                coverage: p.seat?.assets == null ? "The source does not provide a usable asset amount." : "Select to open the declaration record.",
+                context: inspectionContext,
               });
             }}
-            onMouseLeave={() => setHover(null)}
+            onFocus={() => {
+              setHover({
+                title: p.seat?.constituency ?? p.name,
+                subtitle: p.seat ? `${p.seat.name} · ${p.seat.party}` : mapView === "assembly" ? "No matched sitting MLA" : "No matched Lok Sabha winner",
+                value: p.seat ? amountLabel(p.seat.assets) : "No matched declaration",
+                coverage: p.seat?.assets == null ? "The source does not provide a usable asset amount." : "Select to open the declaration record.",
+                context: inspectionContext,
+              });
+            }}
             onClick={() => { if (p.seat) onSelectSeat(p.seat); }}
+            onKeyDown={(event) => {
+              if (!p.seat || (event.key !== "Enter" && event.key !== " ")) return;
+              event.preventDefault();
+              onSelectSeat(p.seat);
+            }}
           >
-            <title>{p.seat ? `${p.seat.constituency}: ${formatRupees(p.seat.assets)}` : p.name}</title>
+            <title>{p.seat ? `${p.seat.constituency}: ${amountLabel(p.seat.assets)}` : p.name}</title>
           </path>
         ))}
       </svg>
-
-      {hover && (
-        <div className="mapTooltip" style={{ left: hover.x + 12, top: hover.y + 12 }}>
-          <b>{hover.title}</b>
-          <span>{hover.subtitle}</span>
-          <strong>{hover.value}</strong>
-        </div>
-      )}
-
-      <div className="mapLegend" aria-hidden="true">
-        <span>Lower</span>
-        <i></i>
-        <span>Higher aggregate</span>
       </div>
-      <small className="mapCredit">Boundaries: DataMeet / community maps · figures are self-declared affidavit assets</small>
+
+      <div className="mapInspector" aria-live="polite">
+        <span>IN VIEW</span>
+        <div><b>{inspection.title}</b><small>{inspection.subtitle}</small></div>
+        <strong>{inspection.value}</strong>
+        <small>{inspection.coverage}</small>
+      </div>
+
+      <div className="mapLegend" aria-label={`${showSeatLayer ? "Seat" : "State"} declared asset color bands`}>
+        <span className="mapLegendTitle">{showSeatLayer ? "DECLARED ASSETS BY SEAT" : "AGGREGATE DECLARED ASSETS"}</span>
+        <div className="mapLegendBands">
+          {MAP_COLORS.map((color, index) => (
+            <span key={color}><i style={{ background: color }}></i><small>{visibleLegend[index]}</small></span>
+          ))}
+          <span><i className="mapUnknownSwatch"></i><small>Amount unavailable</small></span>
+        </div>
+      </div>
+      <small className="mapCredit">Boundaries: DataMeet / community maps · figures are self-declared affidavit assets · aggregate totals sum records, not unique people</small>
     </div>
   );
 }
