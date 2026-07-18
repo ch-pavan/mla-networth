@@ -18,6 +18,8 @@
 /.vinext/
 /out/
 /.github-pages-api/
+/.vercel-api/
+__pycache__/
 
 # misc
 .DS_Store

@@ -31,3 +31,6 @@ jobs:
 
       - name: Verify
         run: npm run verify
+
+      - name: Validate Vercel build
+        run: npm run build:vercel
