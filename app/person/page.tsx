@@ -24,6 +24,11 @@ type Profile = {
 };
 type HistoryPoint = { year:number;assets:number|null;sourceUrl:string };
 
+type SittingHistoryFile = {
+  assembly?: Record<string,{points:{year:number;assets:number;sourceUrl:string}[]}>;
+  lok_sabha?: Record<string,{points:{year:number;assets:number;sourceUrl:string}[]}>;
+};
+
 const ADR_REPORT_URL="https://adrindia.org/sites/default/files/All_India_Sitting_MLAs_Report_2025_English.pdf";
 
 const initials=(name:string)=>name.split(/\s+/).filter(x=>x.length>1).slice(0,2).map(x=>x[0]).join("");
@@ -65,7 +70,7 @@ export default function PersonPage(){
       if(chamber==="lok_sabha"){
         const [snapshot,sittingHistories]=await Promise.all([
           fetchJson<{meta:{sourceUrl:string};records:(Current&{electionFolder?:string;candidateId?:number;candidateUrl?:string;electionYear?:number})[]}>(publicUrl("/data/lok-sabha-sitting-mps.json"),controller.signal),
-          fetchJson<{lok_sabha?:Record<string,{points:{year:number;assets:number;sourceUrl:string}[]}>}>(publicUrl("/data/sitting-mla-asset-histories.json"),controller.signal).catch(()=>({lok_sabha:{}})),
+          fetchJson<SittingHistoryFile>(publicUrl("/data/sitting-mla-asset-histories.json"),controller.signal).catch(():SittingHistoryFile=>({lok_sabha:{}})),
         ]);
         const person=snapshot.records.find(r=>r.rank===rank);
         if(!person)throw new Error("Lok Sabha record not found");
@@ -93,7 +98,7 @@ export default function PersonPage(){
       const [snapshot,comparisons,sittingHistories]=await Promise.all([
         fetchJson<{records:Current[]}>(publicUrl("/data/adr-sitting-mlas-2025.json"),controller.signal),
         fetchJson<{comparisons:AssetComparison[]}>(publicUrl("/data/adr-recontest-history.json"),controller.signal),
-        fetchJson<{assembly:Record<string,{points:{year:number;assets:number;sourceUrl:string}[]}>}>(publicUrl("/data/sitting-mla-asset-histories.json"),controller.signal).catch(()=>({assembly:{}})),
+        fetchJson<SittingHistoryFile>(publicUrl("/data/sitting-mla-asset-histories.json"),controller.signal).catch(():SittingHistoryFile=>({assembly:{}})),
       ]);
       const person=snapshot.records.find(r=>r.rank===rank);
       if(!person)throw new Error("Representative record not found");
