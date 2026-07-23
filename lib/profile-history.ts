@@ -38,7 +38,7 @@ export function normalizePersonName(name: string): string {
   const collapsed = name
     .normalize("NFKD")
     .replace(/\p{M}/gu, "")
-    .replace(/[.'']/g, "")
+    .replace(/[.'']/g, " ")
     .replace(/[^a-zA-Z0-9]+/g, " ")
     .trim()
     .toLowerCase()

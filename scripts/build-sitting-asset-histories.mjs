@@ -4,6 +4,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   buildSittingHistoryEntry,
+  collectCandidacyRowsForName,
   findUniqueWinnerMatch,
   indexRowsByNormalizedName,
   normalizeArchiveName,
@@ -94,7 +95,7 @@ async function enrichMaskedLokSabhaWinners(winnerRecords, neededNames) {
 function buildChamberHistories({
   snapshotRecords,
   winnerRecords,
-  byName,
+  nameIndex,
   chamber,
   fallbackSourceUrl,
 }) {
@@ -118,7 +119,7 @@ function buildChamberHistories({
         candidateId: record.candidateId,
         candidateUrl: record.candidateUrl,
       },
-      candidacyRows: byName.get(normalizeArchiveName(record.name)) ?? [],
+      candidacyRows: collectCandidacyRowsForName(nameIndex, record.name),
       chamber,
       fallbackSourceUrl,
     });
@@ -172,12 +173,12 @@ async function main() {
     if (mapped) candidacyRows.push(mapped);
   }
 
-  const byName = indexRowsByNormalizedName(candidacyRows, (row) => row);
+  const nameIndex = indexRowsByNormalizedName(candidacyRows, (row) => row);
 
   const assembly = buildChamberHistories({
     snapshotRecords: snapshot.records ?? [],
     winnerRecords: assemblyWinners.records ?? [],
-    byName,
+    nameIndex,
     chamber: "assembly",
     fallbackSourceUrl: "https://adrindia.org/sites/default/files/All_India_Sitting_MLAs_Report_2025_English.pdf",
   });
@@ -185,7 +186,7 @@ async function main() {
   const lokSabha = buildChamberHistories({
     snapshotRecords: mpSnapshot.records ?? [],
     winnerRecords: lokSabhaWinners.records ?? [],
-    byName,
+    nameIndex,
     chamber: "lok_sabha",
     fallbackSourceUrl: "https://www.myneta.info/LokSabha2024/index.php",
   });
@@ -206,7 +207,7 @@ async function main() {
       lokSabhaSkippedNoWinner: lokSabha.skippedNoWinner,
       lokSabhaSkippedUnsafe: lokSabha.skippedUnsafe,
       lokSabhaMaskedProfilesEnriched: enrichedMasked,
-      note: "Trails merge imported candidacies/winners for a normalized name (order-insensitive; Chandra Babu→Chandrababu). Same-year dual seats prefer the current constituency, then current assets; otherwise that year is omitted without dropping the whole trail. Masked Lok Sabha winner amounts are filled from candidate profiles when available.",
+      note: "Trails merge imported candidacies/winners for a normalized name (order-insensitive; Chandra Babu→Chandrababu; abbreviated given names like Ch./Chamakura when surname tokens match). Same-year dual seats prefer the current constituency, then current assets; otherwise that year is omitted without dropping the whole trail. Masked Lok Sabha winner amounts are filled from candidate profiles when available.",
     },
     assembly: assembly.out,
     lok_sabha: lokSabha.out,

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  archiveNamesMatch,
   buildSafeAssetTrail,
   buildSittingHistoryEntry,
   findUniqueWinnerMatch,
@@ -17,6 +18,41 @@ test("normalizes archive names like profile history", () => {
     normalizeArchiveName("Nara Chandrababu Naidu"),
     normalizeArchiveName("Chandrababu Naidu Nara"),
   );
+});
+
+test("matches abbreviated given names with the same surname tokens", () => {
+  assert.equal(archiveNamesMatch("Chamakura Malla Reddy", "Ch. Malla Reddy"), true);
+  assert.equal(archiveNamesMatch("Chamakura Malla Reddy", "Ch.malla Reddy"), true);
+  assert.equal(archiveNamesMatch("Chamakura Malla Reddy", "Parwaith Malla Reddy"), false);
+  assert.equal(archiveNamesMatch("Chamakura Malla Reddy", "Dr. S. Malla Reddy"), false);
+});
+
+test("bridges Malla Reddy assembly and Lok Sabha variants", () => {
+  const entry = buildSittingHistoryEntry({
+    snapshotRecord: {
+      rank: 125,
+      name: "Chamakura Malla Reddy",
+      state: "Telangana",
+      electionYear: 2023,
+      constituency: "MEDCHAL",
+      assets: 959473407,
+    },
+    winnerMatch: {
+      electionFolder: "Telangana2023",
+      candidateId: 198,
+      candidateUrl: "https://www.myneta.info/Telangana2023/candidate.php?candidate_id=198",
+    },
+    candidacyRows: [
+      { normalizedName: normalizeArchiveName("Ch.malla Reddy"), name: "Ch.malla Reddy", year: 2014, assets: 488525332, sourceUrl: "ls", state: "Telangana", constituency: "MALKAJGIRI", chamber: "lok_sabha" },
+      { normalizedName: normalizeArchiveName("Ch. Malla Reddy"), name: "Ch. Malla Reddy", year: 2018, assets: 492679933, sourceUrl: "t18", state: "Telangana", constituency: "MEDCHAL", chamber: "assembly" },
+      { normalizedName: normalizeArchiveName("Chamakura Malla Reddy"), name: "Chamakura Malla Reddy", year: 2023, assets: 959473407, sourceUrl: "t23", state: "Telangana", constituency: "MEDCHAL", chamber: "assembly" },
+    ],
+  });
+  assert.deepEqual(entry.points.map((point) => [point.year, point.constituency]), [
+    [2014, "MALKAJGIRI"],
+    [2018, "MEDCHAL"],
+    [2023, "MEDCHAL"],
+  ]);
 });
 
 test("builds a trail when dual candidacies share assets in one year", () => {
