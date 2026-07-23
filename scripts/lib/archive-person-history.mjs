@@ -204,6 +204,36 @@ export function findUniqueWinnerMatch(snapshotRecord, winnerRecords, normalizeNa
   return matches.length === 1 ? matches[0] : null;
 }
 
+/**
+ * Anchor a sitting Rajya Sabha ADR row to a MyNeta archive affidavit.
+ * Prefer exact assets + year; fall back to unique name+year.
+ */
+export function findRajyaSabhaArchiveMatch(snapshotRecord, archiveRecords) {
+  const year = snapshotRecord.electionYear;
+  const named = archiveRecords.filter((row) => (
+    Number.isFinite(row.year)
+    && typeof row.assets === "number"
+    && archiveNamesMatch(snapshotRecord.name, row.name)
+    && (!row.state || !snapshotRecord.state
+      || String(row.state).trim().toLowerCase() === String(snapshotRecord.state).trim().toLowerCase())
+  ));
+  if (!named.length) return null;
+
+  const sameYear = named.filter((row) => row.year === year);
+  const exactAssets = sameYear.filter((row) => row.assets === snapshotRecord.assets);
+  if (exactAssets.length === 1) return exactAssets[0];
+  if (sameYear.length === 1) return sameYear[0];
+
+  const assetAnywhere = named.filter((row) => row.assets === snapshotRecord.assets);
+  if (assetAnywhere.length === 1) return assetAnywhere[0];
+
+  // Latest term for a uniquely named person in-state.
+  const byYear = [...named].sort((left, right) => right.year - left.year || right.candidateId - left.candidateId);
+  const latestYear = byYear[0]?.year;
+  const latest = byYear.filter((row) => row.year === latestYear);
+  return latest.length === 1 ? latest[0] : null;
+}
+
 export function buildSittingHistoryEntry({
   snapshotRecord,
   winnerMatch,

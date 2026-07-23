@@ -27,6 +27,7 @@ type HistoryPoint = { year:number;assets:number|null;sourceUrl:string };
 type SittingHistoryFile = {
   assembly?: Record<string,{points:{year:number;assets:number;sourceUrl:string}[]}>;
   lok_sabha?: Record<string,{points:{year:number;assets:number;sourceUrl:string}[]}>;
+  rajya_sabha?: Record<string,{points:{year:number;assets:number;sourceUrl:string}[]}>;
 };
 
 const ADR_REPORT_URL="https://adrindia.org/sites/default/files/All_India_Sitting_MLAs_Report_2025_English.pdf";
@@ -87,12 +88,22 @@ export default function PersonPage(){
         return;
       }
       if(chamber==="rajya_sabha"){
-        const snapshot=await fetchJson<{meta:{sourceUrl:string};records:(Current&{electionYear?:number|null})[]}>(publicUrl("/data/rajya-sabha-sitting-mps.json"),controller.signal);
+        const [snapshot,sittingHistories]=await Promise.all([
+          fetchJson<{meta:{sourceUrl:string};records:(Current&{electionYear?:number|null})[]}>(publicUrl("/data/rajya-sabha-sitting-mps.json"),controller.signal),
+          fetchJson<SittingHistoryFile>(publicUrl("/data/sitting-mla-asset-histories.json"),controller.signal).catch(():SittingHistoryFile=>({rajya_sabha:{}})),
+        ]);
         const person=snapshot.records.find(r=>r.rank===rank);
         if(!person)throw new Error("Rajya Sabha record not found");
-        const year=person.electionYear||2026;
-        setProfile({kind:"current",name:person.name,state:person.state,year,constituency:person.constituency||"Rajya Sabha",party:person.party,assets:person.assets,liabilities:person.liabilities,criminalCases:person.criminalCases,education:person.education,sourceUrl:snapshot.meta.sourceUrl,age:person.age,gender:person.gender,seriousCases:person.seriousCriminalCases,panDeclared:person.panDeclared,recordId:`RS-${person.rank}`});
-        setHistory([{year,assets:person.assets,sourceUrl:snapshot.meta.sourceUrl}]);
+        if(person.assets===null)throw new Error("Representative assets are unavailable");
+        const year=person.electionYear||2024;
+        const sourceUrl=snapshot.meta.sourceUrl;
+        const verifiedHistory=selectAssetHistory(
+          {state:person.state,electionYear:year,name:person.name,assets:person.assets,sourceUrl},
+          [],
+          sittingHistories.rajya_sabha?.[String(person.rank)]?.points,
+        );
+        setProfile({kind:"current",name:person.name,state:person.state,year,constituency:person.constituency||"Rajya Sabha",party:person.party,assets:person.assets,liabilities:person.liabilities,criminalCases:person.criminalCases,education:person.education,sourceUrl:verifiedHistory.at(-1)?.sourceUrl||sourceUrl,age:person.age,gender:person.gender,seriousCases:person.seriousCriminalCases,panDeclared:person.panDeclared,recordId:`RS-${person.rank}`});
+        setHistory(verifiedHistory);
         return;
       }
       const [snapshot,comparisons,sittingHistories]=await Promise.all([

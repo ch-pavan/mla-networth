@@ -105,6 +105,121 @@ export function parseMynetaConstituencyLabel(label, containingElectionYear) {
   };
 }
 
+/**
+ * Parse MyNeta Rajya Sabha constituency / heading labels such as
+ * `UP (2024-2030) JAYA AMITABH BACHCHAN` or `WEST BENGAL (2017-2023) NAME`.
+ */
+export function parseRajyaSabhaTermLabel(label) {
+  const text = decodeMynetaCell(label);
+  const match = text.match(/^(.*?)\s*\((\d{4})\s*[-–]\s*(\d{4})\)\s*(.*)$/i);
+  if (!match) {
+    return { label: text, stateHint: null, termFrom: null, termTo: null, remainder: text };
+  }
+  const stateHint = match[1].replace(/[-–]\s*$/, "").trim() || null;
+  return {
+    label: text,
+    stateHint,
+    termFrom: Number(match[2]),
+    termTo: Number(match[3]),
+    remainder: match[4].trim(),
+  };
+}
+
+const RAJYA_SABHA_STATE_ALIASES = new Map(Object.entries({
+  "andaman and nicobar islands": "Andaman and Nicobar Islands",
+  "andhra pradesh": "Andhra Pradesh",
+  "arunachal pradesh": "Arunachal Pradesh",
+  assam: "Assam",
+  bihar: "Bihar",
+  chhattisgarh: "Chhattisgarh",
+  goa: "Goa",
+  gujarat: "Gujarat",
+  haryana: "Haryana",
+  "himachal pradesh": "Himachal Pradesh",
+  "jammu and kashmir": "Jammu and Kashmir",
+  jharkhand: "Jharkhand",
+  karnataka: "Karnataka",
+  kerala: "Kerala",
+  "madhya pradesh": "Madhya Pradesh",
+  maharashtra: "Maharashtra",
+  manipur: "Manipur",
+  meghalaya: "Meghalaya",
+  mizoram: "Mizoram",
+  nagaland: "Nagaland",
+  odisha: "Odisha",
+  orissa: "Odisha",
+  puducherry: "Puducherry",
+  punjab: "Punjab",
+  rajasthan: "Rajasthan",
+  sikkim: "Sikkim",
+  "tamil nadu": "Tamil Nadu",
+  telangana: "Telangana",
+  tripura: "Tripura",
+  "uttar pradesh": "Uttar Pradesh",
+  uttarakhand: "Uttarakhand",
+  "west bengal": "West Bengal",
+  "nct of delhi": "NCT of Delhi",
+  delhi: "NCT of Delhi",
+  "nominated": "Nominated",
+  up: "Uttar Pradesh",
+  "u.p.": "Uttar Pradesh",
+  "u.p": "Uttar Pradesh",
+  wb: "West Bengal",
+  "w.b.": "West Bengal",
+  mp: "Madhya Pradesh",
+  "m.p.": "Madhya Pradesh",
+  "m.p": "Madhya Pradesh",
+  tn: "Tamil Nadu",
+  "t.n.": "Tamil Nadu",
+  ap: "Andhra Pradesh",
+  "a.p.": "Andhra Pradesh",
+  hp: "Himachal Pradesh",
+  "h.p.": "Himachal Pradesh",
+  jk: "Jammu and Kashmir",
+  "j&k": "Jammu and Kashmir",
+  rj: "Rajasthan",
+  mh: "Maharashtra",
+  gj: "Gujarat",
+  ka: "Karnataka",
+  kl: "Kerala",
+  pb: "Punjab",
+  hr: "Haryana",
+  cg: "Chhattisgarh",
+  ct: "Chhattisgarh",
+  od: "Odisha",
+  or: "Odisha",
+  ts: "Telangana",
+  tg: "Telangana",
+  uk: "Uttarakhand",
+  ua: "Uttarakhand",
+  ml: "Meghalaya",
+  mn: "Manipur",
+  mz: "Mizoram",
+  nl: "Nagaland",
+  sk: "Sikkim",
+  tr: "Tripura",
+  ar: "Arunachal Pradesh",
+  as: "Assam",
+  br: "Bihar",
+  jh: "Jharkhand",
+  ga: "Goa",
+  py: "Puducherry",
+  dl: "NCT of Delhi",
+}));
+
+export function canonicalizeRajyaSabhaState(value) {
+  const raw = decodeMynetaCell(value).toLowerCase().replace(/\s+/g, " ").trim();
+  if (!raw) return null;
+  if (RAJYA_SABHA_STATE_ALIASES.has(raw)) return RAJYA_SABHA_STATE_ALIASES.get(raw);
+  const stripped = raw.replace(/\d+$/g, "").replace(/[.-]+$/g, "").trim();
+  if (RAJYA_SABHA_STATE_ALIASES.has(stripped)) return RAJYA_SABHA_STATE_ALIASES.get(stripped);
+  // Title-case long names already close to canonical.
+  if (raw.length > 3 && !/^[a-z]{1,3}\d*$/i.test(raw)) {
+    return raw.replace(/\b\w/g, (character) => character.toUpperCase());
+  }
+  return null;
+}
+
 export function countMynetaRecordStatuses(records) {
   const counts = {
     assets: Object.fromEntries(MONEY_STATUSES.map((status) => [status, 0])),

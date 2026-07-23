@@ -26,9 +26,10 @@ type HistoryComparison = { state:string;currentYear:number;previousYear:number;n
 type HistorySnapshot = { meta:{electionPagesAvailable:number;comparisonCount:number;snapshotMatchCount:number;firstYear:number;latestYear:number;note:string}; comparisons:HistoryComparison[] };
 type SittingHistoryPoint = { year:number;assets:number;sourceUrl:string;state?:string|null;constituency?:string|null;chamber?:string|null };
 type SittingHistories = {
-  meta:{assemblyRecords:number;multiYearRecords?:number;lokSabhaRecords?:number};
+  meta:{assemblyRecords:number;multiYearRecords?:number;lokSabhaRecords?:number;rajyaSabhaRecords?:number};
   assembly:Record<string,{points:SittingHistoryPoint[]}>;
   lok_sabha?:Record<string,{points:SittingHistoryPoint[]}>;
+  rajya_sabha?:Record<string,{points:SittingHistoryPoint[]}>;
 };
 type WinnerRecord = { state:string;electionYear:number;electionDate?:string;electionType?:string;baseConstituency?:string;electionFolder:string;rankByAssets:number;candidateId:number;name:string;normalizedName:string;constituency:string;normalizedConstituency:string;party:string;criminalCases:number;education:string;assets:number|null;assetsStatus?:MoneyStatus;liabilities:number|null;liabilitiesStatus?:MoneyStatus;candidateUrl:string };
 type WinnerArchive = { meta:{winnerRecords:number;electionFolders:number;states:number;firstYear:number;latestYear:number;note:string}; records:WinnerRecord[] };
@@ -226,7 +227,9 @@ export default function Home() {
           segments,
           house==="lok_sabha"
             ?sittingHistories?.lok_sabha?.[String(r.rank)]?.points
-            :sittingHistories?.assembly?.[String(r.rank)]?.points,
+            :house==="rajya_sabha"
+              ?sittingHistories?.rajya_sabha?.[String(r.rank)]?.points
+              :sittingHistories?.assembly?.[String(r.rank)]?.points,
         )
         :[{year:electionYear||new Date().getFullYear(),assets:assetsRupees,sourceUrl:r.candidateUrl||source.meta.sourceUrl}];
       const firstAssets=timeline[0]?.assets??assetsRupees;
@@ -237,9 +240,9 @@ export default function Home() {
     });
   },[history,sittingHistories]);
   const allData=useMemo(()=>{
-    if(chamber==="all") return [...mapRecords(snapshot,"assembly",true),...mapRecords(mpSnapshot,"lok_sabha",true),...mapRecords(rsSnapshot,"rajya_sabha",false)];
+    if(chamber==="all") return [...mapRecords(snapshot,"assembly",true),...mapRecords(mpSnapshot,"lok_sabha",true),...mapRecords(rsSnapshot,"rajya_sabha",true)];
     if(chamber==="lok_sabha") return mapRecords(mpSnapshot,"lok_sabha",true);
-    if(chamber==="rajya_sabha") return mapRecords(rsSnapshot,"rajya_sabha",false);
+    if(chamber==="rajya_sabha") return mapRecords(rsSnapshot,"rajya_sabha",true);
     return mapRecords(snapshot,"assembly",true);
   },[snapshot,mpSnapshot,rsSnapshot,chamber,mapRecords]);
   const states=["All India",...Array.from(new Set(allData.map(m=>m.state))).sort()];
@@ -272,7 +275,7 @@ export default function Home() {
     representative.chamber==="lok_sabha"
       ?publicUrl(`/person?type=current&chamber=lok_sabha&rank=${representative.sourceRank??1}`)
       :representative.chamber==="rajya_sabha"
-        ?(representative.sourceUrl||rsSnapshot?.meta.sourceUrl||"https://adrindia.org/")
+        ?publicUrl(`/person?type=current&chamber=rajya_sabha&rank=${representative.sourceRank??1}`)
         :publicUrl(`/person?type=current&chamber=assembly&rank=${representative.sourceRank??1}`);
   const chamberLabel=chamber==="lok_sabha"?"2024 Lok Sabha general-election winners":chamber==="rajya_sabha"?"sitting Rajya Sabha MPs":chamber==="all"?"legislator records":"sitting MLAs";
   const allError=dataErrors.snapshot||dataErrors.mpSnapshot||dataErrors.rsSnapshot;
@@ -288,8 +291,8 @@ export default function Home() {
       ?(assemblyWinnerCount+lsWinnerCount).toLocaleString("en-IN")
       :assemblyWinnerCount.toLocaleString("en-IN");
   const winnerTickerLabel=chamber==="lok_sabha"?"Lok Sabha winners":chamber==="all"?"historical winners":"historical winners";
-  const historyTicker=chamber==="rajya_sabha"?"—":comparisonCount.toLocaleString("en-IN");
-  const historyTickerLabel=chamber==="rajya_sabha"?"no RS history yet":"asset comparisons";
+  const historyTicker=comparisonCount.toLocaleString("en-IN");
+  const historyTickerLabel="asset comparisons";
   const switchChamber=(next:Chamber)=>{
     if(next===chamber) return;
     if(next!=="assembly"&&sort==="growth") setSort("assets");

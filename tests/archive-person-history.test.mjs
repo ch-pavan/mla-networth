@@ -27,6 +27,13 @@ test("matches abbreviated given names with the same surname tokens", () => {
   assert.equal(archiveNamesMatch("Chamakura Malla Reddy", "Dr. S. Malla Reddy"), false);
 });
 
+test("matches reordered Rajya Sabha name tokens", () => {
+  assert.equal(
+    normalizeArchiveName("Jaya Amitabh Bachchan"),
+    normalizeArchiveName("Bachchan Jaya Amitabh"),
+  );
+});
+
 test("bridges Malla Reddy assembly and Lok Sabha variants", () => {
   const entry = buildSittingHistoryEntry({
     snapshotRecord: {
