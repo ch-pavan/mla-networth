@@ -18,10 +18,12 @@ test("formats negative net worth with the correct sign and unit",()=>{
   assert.equal(formatRupees(-91800000),"−₹9.2 Cr");
 });
 
-test("formats lakh, crore, and thousand-crore values consistently",()=>{
+test("formats lakh, crore, and large crore values consistently",()=>{
   assert.equal(formatCrores(0.42),"₹42 L");
   assert.equal(formatCrores(42),"₹42 Cr");
-  assert.equal(formatCrores(1413),"₹1.41k Cr");
+  assert.equal(formatCrores(1413),"₹1,413 Cr");
+  assert.equal(formatCrores(88540),"₹88,540 Cr");
+  assert.equal(formatCrores(126155),"₹1.26 Lakh Cr");
 });
 
 test("keeps unavailable declaration amounts distinct from zero",()=>{

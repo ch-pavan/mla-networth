@@ -64,6 +64,7 @@ const requiredFiles = [
   "person/index.html",
   "data/adr-sitting-mlas-2025.json",
   "data/adr-recontest-history.json",
+  "data/sitting-mla-asset-histories.json",
   "data/adr-winner-archive.json",
   "data/lok-sabha-sitting-mps.json",
   "data/lok-sabha-winner-archive.json",

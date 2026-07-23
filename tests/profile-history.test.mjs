@@ -6,7 +6,7 @@ import "./recontest-history.test.mjs";
 
 const helperSource = await readFile(new URL("../lib/profile-history.ts", import.meta.url), "utf8");
 const helperModule = await import(`data:text/javascript;base64,${Buffer.from(stripTypeScriptTypes(helperSource)).toString("base64")}`);
-const { buildVerifiedAssetHistory, normalizePersonName } = helperModule;
+const { buildVerifiedAssetHistory, normalizePersonName, selectAssetHistory } = helperModule;
 
 const comparison = (overrides = {}) => ({
   state: "Karnataka",
@@ -30,6 +30,10 @@ const anchor = {
 
 test("normalizes filed names consistently", () => {
   assert.equal(normalizePersonName("  D. K.  Shivakumár's  "), "d k shivakumars");
+  assert.equal(
+    normalizePersonName("Chandrababu Naidu Nara"),
+    normalizePersonName("Nara Chandra Babu Naidu"),
+  );
 });
 
 test("builds only an exact-asset contiguous history anchored to the current record", () => {
@@ -72,4 +76,19 @@ test("excludes comparisons that require identity review", () => {
   ]);
 
   assert.deepEqual(history, [{year:2024,assets:300,sourceUrl:"https://adrindia.org/report.pdf"}]);
+});
+
+test("prefers a longer archive trail that still anchors on the current declaration", () => {
+  const history = selectAssetHistory(
+    anchor,
+    [comparison()],
+    [
+      {year:2014,assets:100,sourceUrl:"https://www.myneta.info/2014"},
+      {year:2019,assets:200,sourceUrl:"https://www.myneta.info/2019"},
+      {year:2024,assets:300,sourceUrl:"https://www.myneta.info/2024"},
+    ],
+  );
+
+  assert.deepEqual(history.map((point) => [point.year, point.assets]), [[2014,100],[2019,200],[2024,300]]);
+  assert.equal(history.at(-1).sourceUrl, "https://adrindia.org/report.pdf");
 });

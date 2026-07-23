@@ -2,8 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "About, methodology and corrections — NetaWorth",
-  description: "How NetaWorth sources, connects and corrects election-affidavit records.",
+  title: "About & methodology",
+  description:
+    "How NetaWorth sources election affidavits from ECI, ADR and MyNeta, connects sitting MLA and MP wealth records, and handles corrections.",
+  alternates: { canonical: "/about" },
+  openGraph: {
+    title: "About NetaWorth — methodology and sources",
+    description:
+      "How NetaWorth sources election affidavits from ECI, ADR and MyNeta and connects sitting MLA and MP wealth records.",
+    url: "/about",
+  },
 };
 
 export default function AboutPage() {

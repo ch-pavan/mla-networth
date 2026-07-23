@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { availableMoney, declaredNetWorth, formatRupees as money, type MoneyStatus } from "../../lib/format-money";
-import { buildVerifiedAssetHistory, type AssetComparison } from "../../lib/profile-history";
+import { selectAssetHistory, type AssetComparison } from "../../lib/profile-history";
 import { publicUrl } from "../../lib/public-url";
 
 type Candidate = {
@@ -63,15 +63,22 @@ export default function PersonPage(){
       const rank=Number(params.get("rank"));
       const chamber=params.get("chamber")||"assembly";
       if(chamber==="lok_sabha"){
-        const snapshot=await fetchJson<{meta:{sourceUrl:string};records:(Current&{electionFolder?:string;candidateId?:number;candidateUrl?:string;electionYear?:number})[]}>(publicUrl("/data/lok-sabha-sitting-mps.json"),controller.signal);
+        const [snapshot,sittingHistories]=await Promise.all([
+          fetchJson<{meta:{sourceUrl:string};records:(Current&{electionFolder?:string;candidateId?:number;candidateUrl?:string;electionYear?:number})[]}>(publicUrl("/data/lok-sabha-sitting-mps.json"),controller.signal),
+          fetchJson<{lok_sabha?:Record<string,{points:{year:number;assets:number;sourceUrl:string}[]}>}>(publicUrl("/data/sitting-mla-asset-histories.json"),controller.signal).catch(()=>({lok_sabha:{}})),
+        ]);
         const person=snapshot.records.find(r=>r.rank===rank);
         if(!person)throw new Error("Lok Sabha record not found");
-        if(person.electionFolder&&person.candidateId){
-          window.location.replace(publicUrl(`/person?type=candidate&election=${encodeURIComponent(person.electionFolder)}&id=${person.candidateId}`));
-          return;
-        }
-        setProfile({kind:"current",name:person.name,state:person.state,year:person.electionYear||2024,constituency:person.constituency,party:person.party,assets:person.assets,liabilities:person.liabilities,criminalCases:person.criminalCases,education:person.education,sourceUrl:person.candidateUrl||snapshot.meta.sourceUrl,age:person.age,gender:person.gender,seriousCases:person.seriousCriminalCases,panDeclared:person.panDeclared,recordId:`LS-${person.rank}`});
-        setHistory([{year:person.electionYear||2024,assets:person.assets,sourceUrl:person.candidateUrl||snapshot.meta.sourceUrl}]);
+        if(person.assets===null)throw new Error("Representative assets are unavailable");
+        const year=person.electionYear||2024;
+        const sourceUrl=person.candidateUrl||snapshot.meta.sourceUrl;
+        const verifiedHistory=selectAssetHistory(
+          {state:person.state,electionYear:year,name:person.name,assets:person.assets,sourceUrl},
+          [],
+          sittingHistories.lok_sabha?.[String(person.rank)]?.points,
+        );
+        setProfile({kind:"current",name:person.name,state:person.state,year,constituency:person.constituency,party:person.party,assets:person.assets,liabilities:person.liabilities,criminalCases:person.criminalCases,education:person.education,sourceUrl:verifiedHistory.at(-1)?.sourceUrl||sourceUrl,age:person.age,gender:person.gender,seriousCases:person.seriousCriminalCases,panDeclared:person.panDeclared,recordId:`LS-${person.rank}`});
+        setHistory(verifiedHistory);
         return;
       }
       if(chamber==="rajya_sabha"){
@@ -83,14 +90,19 @@ export default function PersonPage(){
         setHistory([{year,assets:person.assets,sourceUrl:snapshot.meta.sourceUrl}]);
         return;
       }
-      const [snapshot,comparisons]=await Promise.all([
+      const [snapshot,comparisons,sittingHistories]=await Promise.all([
         fetchJson<{records:Current[]}>(publicUrl("/data/adr-sitting-mlas-2025.json"),controller.signal),
         fetchJson<{comparisons:AssetComparison[]}>(publicUrl("/data/adr-recontest-history.json"),controller.signal),
+        fetchJson<{assembly:Record<string,{points:{year:number;assets:number;sourceUrl:string}[]}>}>(publicUrl("/data/sitting-mla-asset-histories.json"),controller.signal).catch(()=>({assembly:{}})),
       ]);
       const person=snapshot.records.find(r=>r.rank===rank);
       if(!person)throw new Error("Representative record not found");
       if(person.assets===null)throw new Error("Representative assets are unavailable");
-      const verifiedHistory=buildVerifiedAssetHistory({state:person.state,electionYear:person.electionYear,name:person.name,assets:person.assets,sourceUrl:ADR_REPORT_URL},comparisons.comparisons);
+      const verifiedHistory=selectAssetHistory(
+        {state:person.state,electionYear:person.electionYear,name:person.name,assets:person.assets,sourceUrl:ADR_REPORT_URL},
+        comparisons.comparisons,
+        sittingHistories.assembly?.[String(person.rank)]?.points,
+      );
       setProfile({kind:"current",name:person.name,state:person.state,year:person.electionYear,constituency:person.constituency,party:person.party,assets:person.assets,liabilities:person.liabilities,criminalCases:person.criminalCases,education:person.education,sourceUrl:verifiedHistory.at(-1)?.sourceUrl||ADR_REPORT_URL,age:person.age,gender:person.gender,seriousCases:person.seriousCriminalCases,panDeclared:person.panDeclared,recordId:`ADR-2025-${person.rank}`});
       setHistory(verifiedHistory);
     };
@@ -115,9 +127,9 @@ export default function PersonPage(){
       <section className="personContent">
         <div className="personMain">
           <div className="personMetrics"><article><small>DECLARED ASSETS</small><b>{money(profile.assets)}</b></article><article><small>LIABILITIES</small><b>{money(profile.liabilities)}</b></article><article><small>CRIMINAL CASES</small><b>{profile.criminalCases??"Unavailable"}</b></article>{growth!==null&&<article><small>CHANGE SINCE FIRST MATCH</small><b className={growth>=0?"positive":"negative"}>{growth>=0?"+":""}{growth.toFixed(1)}%</b></article>}</div>
-          <article className="personTimeline"><header><div><span>DECLARATION TRAIL</span><h2>Declared assets over time</h2></div><small>₹ values are affidavit declarations</small></header><div className="personBars">{history.map(point=><a href={point.sourceUrl} target="_blank" rel="noreferrer" className="personBar" key={`${point.year}-${point.assets}`}><b>{money(point.assets)}</b><div>{point.assets===null?<span aria-label="Declared assets unavailable">—</span>:<i style={{height:`${Math.max(12,(point.assets/maxAssets)*220)}px`}}></i>}</div><time>{point.year}</time><small>{point.year===profile.year?<>{profile.party}<br/>{profile.constituency}</>:<>Exact-asset<br/>linked affidavit</>}</small></a>)}</div>{history.length===1&&<p className="singleRecord">{profile.kind==="candidate"?"Only the selected candidate affidavit is shown; same-name records are not combined.":"No earlier exact-asset comparison is connected to this record."}</p>}</article>
+          <article className="personTimeline"><header><div><span>DECLARATION TRAIL</span><h2>Declared assets over time</h2></div><small>₹ values are affidavit declarations</small></header><div className="personBars">{history.map(point=><a href={point.sourceUrl} target="_blank" rel="noreferrer" className="personBar" key={`${point.year}-${point.assets}`}><b>{money(point.assets)}</b><div>{point.assets===null?<span aria-label="Declared assets unavailable">—</span>:<i style={{height:`${Math.max(12,(point.assets/maxAssets)*220)}px`}}></i>}</div><time>{point.year}</time><small>{point.year===profile.year?<>{profile.party}<br/>{profile.constituency}</>:<>Imported<br/>affidavit</>}</small></a>)}</div>{history.length===1&&<p className="singleRecord">{profile.kind==="candidate"?"Only the selected candidate affidavit is shown; same-name records are not combined.":"No earlier imported affidavit is connected to this record yet."}</p>}</article>
         </div>
-        <aside className="personFacts"><span>RECORD DETAILS</span><dl><div><dt>Election year</dt><dd>{profile.year}</dd></div>{profile.electionDate&&<div><dt>Election date</dt><dd><time dateTime={profile.electionDate}>{profile.electionDate}</time></dd></div>}{profile.electionType&&<div><dt>Election type</dt><dd>{profile.electionType}</dd></div>}<div><dt>State / UT</dt><dd>{profile.state}</dd></div><div><dt>Constituency</dt><dd>{profile.constituency}</dd></div><div><dt>Party</dt><dd>{profile.party}</dd></div><div><dt>Education</dt><dd>{profile.education||"Not declared"}</dd></div>{profile.kind==="current"&&<><div><dt>Age / gender</dt><dd>{profile.age??"—"} / {profile.gender||"—"}</dd></div><div><dt>Serious cases</dt><dd>{profile.seriousCases??"Unavailable"}</dd></div><div><dt>PAN declared</dt><dd>{profile.panDeclared==null?"Unavailable":profile.panDeclared?"Yes":"No"}</dd></div></>}<div><dt>NetaWorth record</dt><dd>{profile.recordId}</dd></div></dl><a href={profile.sourceUrl} target="_blank" rel="noreferrer">{profile.kind==="current"?"Open national source report ↗":"Verify source affidavit ↗"}</a><p>These are self-declared figures, not independently audited market wealth. {profile.kind==="current"?"History is connected only through contiguous comparisons with exact name, year, state, and asset matches.":"This profile shows only the selected affidavit; same-name records from other elections are not treated as the same person."}</p></aside>
+        <aside className="personFacts"><span>RECORD DETAILS</span><dl><div><dt>Election year</dt><dd>{profile.year}</dd></div>{profile.electionDate&&<div><dt>Election date</dt><dd><time dateTime={profile.electionDate}>{profile.electionDate}</time></dd></div>}{profile.electionType&&<div><dt>Election type</dt><dd>{profile.electionType}</dd></div>}<div><dt>State / UT</dt><dd>{profile.state}</dd></div><div><dt>Constituency</dt><dd>{profile.constituency}</dd></div><div><dt>Party</dt><dd>{profile.party}</dd></div><div><dt>Education</dt><dd>{profile.education||"Not declared"}</dd></div>{profile.kind==="current"&&<><div><dt>Age / gender</dt><dd>{profile.age??"—"} / {profile.gender||"—"}</dd></div><div><dt>Serious cases</dt><dd>{profile.seriousCases??"Unavailable"}</dd></div><div><dt>PAN declared</dt><dd>{profile.panDeclared==null?"Unavailable":profile.panDeclared?"Yes":"No"}</dd></div></>}<div><dt>NetaWorth record</dt><dd>{profile.recordId}</dd></div></dl><a href={profile.sourceUrl} target="_blank" rel="noreferrer">{profile.kind==="current"?"Open national source report ↗":"Verify source affidavit ↗"}</a><p>These are self-declared figures, not independently audited market wealth. {profile.kind==="current"?"History prefers imported MyNeta candidacy trails when each year has one asset value; otherwise it falls back to exact-asset recontest links.":"This profile shows only the selected affidavit; same-name records from other elections are not treated as the same person."}</p></aside>
       </section>
     </>}
   </main></>;

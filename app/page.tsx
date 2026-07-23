@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { availableMoney, compareAvailableMoneyDescending, formatCrores as fmt, type MoneyStatus } from "../lib/format-money";
-import { buildVerifiedAssetHistory, normalizePersonName } from "../lib/profile-history";
+import { selectAssetHistory, normalizePersonName } from "../lib/profile-history";
 import { publicUrl } from "../lib/public-url";
 import { buildDisplayableSeatHistories, compareWinnerElections } from "../lib/winner-history";
 
@@ -24,6 +24,12 @@ type DatasetKey = "snapshot"|"history"|"archive"|"candidateIndex"|"mpSnapshot"|"
 type DatasetAttempts = Record<DatasetKey,number>;
 type HistoryComparison = { state:string;currentYear:number;previousYear:number;name:string;normalizedName:string;party:string;currentAssets:number;previousAssets:number;percentChange:number;remarks:string;comparisonUrl:string;currentSnapshotRank:number|null;matchedToSnapshot:boolean };
 type HistorySnapshot = { meta:{electionPagesAvailable:number;comparisonCount:number;snapshotMatchCount:number;firstYear:number;latestYear:number;note:string}; comparisons:HistoryComparison[] };
+type SittingHistoryPoint = { year:number;assets:number;sourceUrl:string;state?:string|null;constituency?:string|null;chamber?:string|null };
+type SittingHistories = {
+  meta:{assemblyRecords:number;multiYearRecords?:number;lokSabhaRecords?:number};
+  assembly:Record<string,{points:SittingHistoryPoint[]}>;
+  lok_sabha?:Record<string,{points:SittingHistoryPoint[]}>;
+};
 type WinnerRecord = { state:string;electionYear:number;electionDate?:string;electionType?:string;baseConstituency?:string;electionFolder:string;rankByAssets:number;candidateId:number;name:string;normalizedName:string;constituency:string;normalizedConstituency:string;party:string;criminalCases:number;education:string;assets:number|null;assetsStatus?:MoneyStatus;liabilities:number|null;liabilitiesStatus?:MoneyStatus;candidateUrl:string };
 type WinnerArchive = { meta:{winnerRecords:number;electionFolders:number;states:number;firstYear:number;latestYear:number;note:string}; records:WinnerRecord[] };
 type CandidateRecord = { ordinal:number;candidateId:number;name:string;normalizedName:string;constituency:string;normalizedConstituency:string;party:string;criminalCases:number;education:string;assets:number|null;assetsStatus?:MoneyStatus;liabilities:number|null;liabilitiesStatus?:MoneyStatus;electionYear?:number;electionDate?:string|null;electionType?:string;baseConstituency?:string;candidateUrl:string };
@@ -43,9 +49,12 @@ async function fetchJson<T>(url:string, signal:AbortSignal):Promise<T> {
 }
 
 function Sparkline({ values, color="#df6b32" }:{values:number[],color?:string}) {
+  if(values.length===0) return null;
   const max=Math.max(...values), min=Math.min(...values), range=max-min||1;
-  const pts=values.map((v,i)=>`${(i/(values.length-1))*90+5},${34-((v-min)/range)*28}`).join(" ");
-  return <svg className="spark" viewBox="0 0 100 40" aria-hidden="true"><polyline points={pts} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>{values.map((v,i)=><circle key={i} cx={(i/(values.length-1))*90+5} cy={34-((v-min)/range)*28} r="2.5" fill={color}/>)}</svg>
+  const xAt=(i:number)=>values.length===1?50:(i/(values.length-1))*90+5;
+  const yAt=(v:number)=>34-((v-min)/range)*28;
+  const pts=values.map((v,i)=>`${xAt(i)},${yAt(v)}`).join(" ");
+  return <svg className="spark" viewBox="0 0 100 40" aria-hidden="true"><polyline points={pts} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>{values.map((v,i)=><circle key={i} cx={xAt(i)} cy={yAt(v)} r="2.5" fill={color}/>)}</svg>
 }
 
 export default function Home() {
@@ -61,6 +70,7 @@ export default function Home() {
   const [mpSnapshot,setMpSnapshot]=useState<AdrSnapshot|null>(null);
   const [rsSnapshot,setRsSnapshot]=useState<AdrSnapshot|null>(null);
   const [history,setHistory]=useState<HistorySnapshot|null>(null);
+  const [sittingHistories,setSittingHistories]=useState<SittingHistories|null>(null);
   const [archive,setArchive]=useState<WinnerArchive|null>(null);
   const [lsArchive,setLsArchive]=useState<WinnerArchive|null>(null);
   const [dataErrors,setDataErrors]=useState<Partial<Record<DatasetKey,string>>>({});
@@ -134,6 +144,14 @@ export default function Home() {
   },[dataAttempts.candidateIndex]);
 
   useEffect(()=>{
+    const controller=new AbortController();
+    void fetchJson<SittingHistories>(publicUrl("/data/sitting-mla-asset-histories.json"),controller.signal).then(data=>{
+      if(!controller.signal.aborted) setSittingHistories(data);
+    }).catch(()=>{/* optional enrichment; recontest history remains available */});
+    return ()=>controller.abort();
+  },[]);
+
+  useEffect(()=>{
     if(!requestedSections.history) return;
     if(chamber!=="assembly") return;
     const controller=new AbortController();
@@ -203,18 +221,24 @@ export default function Home() {
       const electionYear=r.electionYear??0;
       const segments=(comparisons.get(`${r.state}|${normalizeName(r.name)}`)??[]).sort((a,b)=>a.currentYear-b.currentYear);
       const timeline=withHistory
-        ?buildVerifiedAssetHistory({state:r.state,electionYear,name:r.name,assets:assetsRupees,sourceUrl:source.meta.sourceUrl},segments)
+        ?selectAssetHistory(
+          {state:r.state,electionYear,name:r.name,assets:assetsRupees,sourceUrl:r.candidateUrl||source.meta.sourceUrl},
+          segments,
+          house==="lok_sabha"
+            ?sittingHistories?.lok_sabha?.[String(r.rank)]?.points
+            :sittingHistories?.assembly?.[String(r.rank)]?.points,
+        )
         :[{year:electionYear||new Date().getFullYear(),assets:assetsRupees,sourceUrl:r.candidateUrl||source.meta.sourceUrl}];
       const firstAssets=timeline[0]?.assets??assetsRupees;
       const growth=timeline.length>1&&firstAssets>0?Math.round(((assetsRupees-firstAssets)/firstAssets)*100):0;
-      const years=timeline.length>1?timeline.map(x=>x.year):[timeline[0].year,timeline[0].year];
-      const values=timeline.length>1?timeline.map(x=>x.assets/1e7):[assetsRupees/1e7,assetsRupees/1e7];
+      const years=timeline.map(x=>x.year);
+      const values=timeline.map(x=>x.assets/1e7);
       return [{name:r.name,state:r.state,constituency:r.constituency||"Rajya Sabha",party:r.party,assets:assetsRupees/1e7,liabilities:liabilitiesRupees===null?null:liabilitiesRupees/1e7,growth,years,values,cases:r.criminalCases,historical:timeline.length>1,education:r.education,age:r.age,gender:r.gender??undefined,sourceRank:r.rank,sourceUrl:r.candidateUrl||(timeline.length>1?timeline.at(-2)?.sourceUrl:undefined)||source.meta.sourceUrl,electionFolder:r.electionFolder,candidateId:r.candidateId,chamber:house}];
     });
-  },[history]);
+  },[history,sittingHistories]);
   const allData=useMemo(()=>{
-    if(chamber==="all") return [...mapRecords(snapshot,"assembly",false),...mapRecords(mpSnapshot,"lok_sabha",false),...mapRecords(rsSnapshot,"rajya_sabha",false)];
-    if(chamber==="lok_sabha") return mapRecords(mpSnapshot,"lok_sabha",false);
+    if(chamber==="all") return [...mapRecords(snapshot,"assembly",true),...mapRecords(mpSnapshot,"lok_sabha",true),...mapRecords(rsSnapshot,"rajya_sabha",false)];
+    if(chamber==="lok_sabha") return mapRecords(mpSnapshot,"lok_sabha",true);
     if(chamber==="rajya_sabha") return mapRecords(rsSnapshot,"rajya_sabha",false);
     return mapRecords(snapshot,"assembly",true);
   },[snapshot,mpSnapshot,rsSnapshot,chamber,mapRecords]);
@@ -245,8 +269,8 @@ export default function Home() {
     document.getElementById("profile")?.scrollIntoView({behavior:"smooth",block:"start"});
   };
   const profileHref=(representative:MLA)=>
-    representative.chamber==="lok_sabha" && representative.electionFolder && representative.candidateId
-      ?publicUrl(`/person?type=candidate&election=${encodeURIComponent(representative.electionFolder)}&id=${representative.candidateId}`)
+    representative.chamber==="lok_sabha"
+      ?publicUrl(`/person?type=current&chamber=lok_sabha&rank=${representative.sourceRank??1}`)
       :representative.chamber==="rajya_sabha"
         ?(representative.sourceUrl||rsSnapshot?.meta.sourceUrl||"https://adrindia.org/")
         :publicUrl(`/person?type=current&chamber=assembly&rank=${representative.sourceRank??1}`);

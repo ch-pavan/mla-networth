@@ -17,7 +17,9 @@ test("ships the NetaWorth product experience", async () => {
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
   ]);
-  assert.match(layout, /NetaWorth — Follow the money\. Know your neta\./i);
+  assert.match(layout, /Declared assets of India/i);
+  assert.match(layout, /application\/ld\+json/);
+  assert.match(layout, /schema\.org/);
   assert.match(page, /India&apos;s most ambitious public record/);
   assert.match(page, /switchChamber\("all"\)/);
   assert.match(page, /All India/);
@@ -26,7 +28,7 @@ test("ships the NetaWorth product experience", async () => {
   assert.match(page, /State of wealth/);
   assert.match(page, /Signals in the declarations/);
   assert.match(page, /Public records/);
-  assert.match(page, /buildVerifiedAssetHistory/);
+  assert.match(page, /selectAssetHistory/);
   assert.match(page, /Load more representatives/);
   assert.match(page, /IntersectionObserver/);
   assert.doesNotMatch(page, /const mlaData/);
@@ -83,6 +85,34 @@ test("ships national two-election wealth comparisons", async () => {
   assert.ok(history.comparisons.every((row) => row.comparisonUrl.startsWith("https://www.myneta.info/")));
 });
 
+test("ships archive-stitched sitting MLA asset histories", async () => {
+  const snapshot = JSON.parse(await readFile(new URL("../public/data/adr-sitting-mlas-2025.json", import.meta.url), "utf8"));
+  const histories = JSON.parse(await readFile(new URL("../public/data/sitting-mla-asset-histories.json", import.meta.url), "utf8"));
+  assert.ok(histories.meta.assemblyRecords >= 3500);
+  assert.ok(histories.meta.assemblyMultiYearRecords >= 1900);
+  assert.ok(histories.meta.lokSabhaRecords >= 400);
+  const revanth = snapshot.records.find((row) => /anumula revanth reddy/i.test(row.name));
+  assert.ok(revanth);
+  const trail = histories.assembly[String(revanth.rank)];
+  assert.deepEqual(trail.points.map((point) => point.year), [2009, 2014, 2018, 2019, 2023]);
+  assert.equal(trail.points.at(-1).assets, revanth.assets);
+
+  const naidu = snapshot.records.find((row) => /chandrababu naidu nara/i.test(row.name));
+  assert.ok(naidu);
+  assert.deepEqual(
+    histories.assembly[String(naidu.rank)].points.map((point) => point.year),
+    [2014, 2019, 2024],
+  );
+
+  const ls = JSON.parse(await readFile(new URL("../public/data/lok-sabha-sitting-mps.json", import.meta.url), "utf8"));
+  const modi = ls.records.find((row) => /narendra modi/i.test(row.name));
+  assert.ok(modi);
+  assert.deepEqual(
+    histories.lok_sabha[String(modi.rank)].points.map((point) => point.year),
+    [2012, 2014, 2019, 2024],
+  );
+});
+
 test("ships the historical constituency-winner archive", async () => {
   const archive = JSON.parse(await readFile(new URL("../public/data/adr-winner-archive.json", import.meta.url), "utf8"));
   assert.equal(archive.meta.electionFolders, 135);
@@ -130,7 +160,7 @@ test("opens people on a dedicated internal profile route", async () => {
   assert.match(person, /SITTING MLA PROFILE/);
   assert.match(person, /Declared assets over time/);
   assert.match(person, /Return to NetaWorth|Database/);
-  assert.match(person, /buildVerifiedAssetHistory/);
+  assert.match(person, /selectAssetHistory/);
   assert.match(person, /Only the selected candidate affidavit is shown/);
   assert.doesNotMatch(person, /Promise\.all\(elections\.map/);
 });

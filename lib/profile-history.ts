@@ -25,14 +25,65 @@ export type VerifiedAssetHistoryPoint = {
   sourceUrl: string;
 };
 
+export type ArchiveHistoryPoint = {
+  year: number;
+  assets: number;
+  sourceUrl: string;
+  state?: string | null;
+  constituency?: string | null;
+  chamber?: string | null;
+};
+
 export function normalizePersonName(name: string): string {
-  return name
+  const collapsed = name
     .normalize("NFKD")
     .replace(/\p{M}/gu, "")
-    .replace(/[.']/g, "")
+    .replace(/[.'']/g, "")
     .replace(/[^a-zA-Z0-9]+/g, " ")
     .trim()
-    .toLowerCase();
+    .toLowerCase()
+    .replace(/\bchandra babu\b/g, "chandrababu");
+
+  return collapsed
+    .split(/\s+/)
+    .filter(Boolean)
+    .sort()
+    .join(" ");
+}
+
+/**
+ * Prefer the longer imported-archive trail when it includes the current
+ * declaration. Otherwise keep the exact-asset recontest chain.
+ */
+export function selectAssetHistory(
+  anchor: AssetHistoryAnchor,
+  comparisons: readonly AssetComparison[],
+  archivePoints?: readonly ArchiveHistoryPoint[] | null,
+): VerifiedAssetHistoryPoint[] {
+  const recontest = buildVerifiedAssetHistory(anchor, comparisons);
+  if (!archivePoints?.length) return recontest;
+
+  const normalized = archivePoints
+    .filter((point) => Number.isFinite(point.year) && Number.isFinite(point.assets) && point.sourceUrl)
+    .map((point) => ({
+      year: point.year,
+      assets: point.assets,
+      sourceUrl: point.sourceUrl,
+    }))
+    .sort((left, right) => left.year - right.year || left.assets - right.assets);
+
+  if (!normalized.length) return recontest;
+
+  const last = normalized.at(-1)!;
+  const anchorsCurrent = last.year === anchor.electionYear && last.assets === anchor.assets;
+  if (!anchorsCurrent) return recontest;
+  if (normalized.length < recontest.length) return recontest;
+
+  return normalized.map((point, index) => (
+    index === normalized.length - 1
+      ? { ...point, sourceUrl: anchor.sourceUrl || point.sourceUrl }
+      : point
+  ));
 }
 
 /**
