@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 import { readFile } from "node:fs/promises";
-import { writeJsonAtomic } from "./lib/archive-generation.mjs";
+import {
+  createLimiter,
+  parseCandidateProfileIdentity,
+  writeJsonAtomic,
+} from "./lib/archive-generation.mjs";
 
 function moneyValue(value, status) {
   if (status === "masked" || status === "missing") return null;
@@ -66,6 +70,31 @@ const records = electionWinners.map((entry, index) => ({
   candidateUrl: entry.candidate.candidateUrl,
 }));
 
+const limit = createLimiter(8);
+let enrichedAge = 0;
+let enrichedGender = 0;
+await Promise.all(records.map((record) => limit(async () => {
+  if (!record.candidateUrl) return;
+  try {
+    const response = await fetch(record.candidateUrl, {
+      headers: { "user-agent": "NetaWorthHistoryBuilder/1.0" },
+      signal: AbortSignal.timeout(20000),
+    });
+    if (!response.ok) return;
+    const identity = parseCandidateProfileIdentity(await response.text());
+    if (identity.age != null) {
+      record.age = identity.age;
+      enrichedAge += 1;
+    }
+    if (identity.gender) {
+      record.gender = identity.gender;
+      enrichedGender += 1;
+    }
+  } catch {
+    // Leave nulls; UI shows em dash.
+  }
+})));
+
 const payload = {
   meta: {
     title: `Lok Sabha ${latestYear} general-election winners — affidavit snapshot`,
@@ -79,7 +108,9 @@ const payload = {
     recordCount: records.length,
     candidateArchiveFile: "/data/candidates/loksabha2024.json",
     candidateArchiveCrossCheckComplete: true,
-    note: "The 543 winners declared after the 2024 Lok Sabha general election, enriched from the complete LokSabha2024 candidate-affidavit shard. This is an election-result snapshot, not a claim about current or sitting membership. Assets and liabilities are self-declared, not audited market wealth. Age, gender, PAN and serious-case values are unavailable in this archive and remain null.",
+    agesEnrichedFromProfiles: enrichedAge,
+    gendersEnrichedFromProfiles: enrichedGender,
+    note: "The 543 winners declared after the 2024 Lok Sabha general election, enriched from the complete LokSabha2024 candidate-affidavit shard. Age (and gender when published) are filled from MyNeta candidate profile pages. This is an election-result snapshot, not a claim about current or sitting membership. Assets and liabilities are self-declared, not audited market wealth.",
   },
   records,
 };

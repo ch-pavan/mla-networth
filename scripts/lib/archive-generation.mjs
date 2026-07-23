@@ -61,6 +61,24 @@ export function parseCandidateProfileMoney(html) {
   return result;
 }
 
+/** Parse Age (and Sex/Gender when present) from a MyNeta candidate profile page. */
+export function parseCandidateProfileIdentity(html) {
+  const text = String(html ?? "");
+  const ageMatch = text.match(/<b>\s*Age\s*:?\s*<\/b>\s*(\d{1,3})\b/i);
+  const ageValue = ageMatch ? Number(ageMatch[1]) : null;
+  const age = Number.isInteger(ageValue) && ageValue > 0 && ageValue < 120 ? ageValue : null;
+
+  const sexMatch = text.match(/<b>\s*(?:Sex|Gender)\s*:?\s*<\/b>\s*([A-Za-z]+)/i);
+  let gender = null;
+  if (sexMatch) {
+    const raw = sexMatch[1].trim().toLowerCase();
+    if (raw.startsWith("m")) gender = "M";
+    else if (raw.startsWith("f")) gender = "F";
+  }
+
+  return { age, gender };
+}
+
 export function candidateProfileUrl(election, candidateId) {
   if (!Number.isSafeInteger(candidateId) || candidateId <= 0) {
     throw new TypeError("candidateId must be a positive safe integer");
