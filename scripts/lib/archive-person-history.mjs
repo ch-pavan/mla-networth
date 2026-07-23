@@ -32,6 +32,17 @@ export function archiveSurnameKey(name) {
   return `${tokens.at(-2)} ${tokens.at(-1)}`;
 }
 
+/** Honorifics that appear inconsistently across affidavit years and carry no identity info. */
+const HONORIFIC_TOKENS = new Set([
+  "dr", "shri", "sri", "smt", "thiru", "thirumathi", "kumari", "km", "kum",
+  "mr", "mrs", "ms", "shrimati", "er", "adv", "capt", "col", "prof", "justice",
+]);
+
+function stripHonorifics(tokens) {
+  const stripped = tokens.filter((token) => !HONORIFIC_TOKENS.has(token));
+  return stripped.length ? stripped : tokens;
+}
+
 function tokenPairCompatible(left, right) {
   if (left === right) return true;
   if (left.length >= 1 && left.length <= 3 && right.length > left.length && right.startsWith(left)) return true;
@@ -57,9 +68,9 @@ function givenNamesCompatible(left, right) {
  */
 export function archiveNamesMatch(left, right) {
   if (normalizeArchiveName(left) === normalizeArchiveName(right)) return true;
-  const leftTokens = archiveNameTokens(left);
-  const rightTokens = archiveNameTokens(right);
-  if (leftTokens.length < 3 || rightTokens.length < 3) return false;
+  const leftTokens = stripHonorifics(archiveNameTokens(left));
+  const rightTokens = stripHonorifics(archiveNameTokens(right));
+  if (leftTokens.length < 2 || rightTokens.length < 2) return false;
   if (leftTokens.at(-1) !== rightTokens.at(-1) || leftTokens.at(-2) !== rightTokens.at(-2)) return false;
   return givenNamesCompatible(leftTokens.slice(0, -2), rightTokens.slice(0, -2));
 }
@@ -178,8 +189,9 @@ export function collectCandidacyRowsForName(index, name) {
   for (const key of bySurname.get(surname) ?? []) {
     if (key === exact) continue;
     const group = byName.get(key) ?? [];
-    const sampleName = group[0]?.name;
-    if (!sampleName || !archiveNamesMatch(name, sampleName)) continue;
+    // Any group member matching is enough — token order within a group can vary
+    // (e.g. "CHIDAMBARAM, P." vs "P. Chidambaram" vs "Thiru. P. Chidambaram").
+    if (!group.some((row) => archiveNamesMatch(name, row.name))) continue;
     for (const row of group) {
       if (seen.has(row)) continue;
       seen.add(row);

@@ -42,6 +42,21 @@ const parties: Record<string,string> = { BJP:"#f28b22", INC:"#3f78c5", TDP:"#e4c
 
 const normalizeName = normalizePersonName;
 const errorMessage = (error:unknown) => error instanceof Error ? error.message : "The data could not be loaded.";
+/** Search-friendly normalize: keep token order (unlike identity normalize, which sorts). */
+const searchText = (value:string) => value
+  .normalize("NFKD")
+  .replace(/\p{M}/gu, "")
+  .replace(/[.'']/g, " ")
+  .replace(/[^a-zA-Z0-9]+/g, " ")
+  .trim()
+  .toLowerCase()
+  .replace(/\bchandra babu\b/g, "chandrababu");
+const matchesSearch = (haystack:string, query:string) => {
+  const tokens = searchText(query).split(/\s+/).filter(Boolean);
+  if (!tokens.length) return true;
+  const hay = searchText(haystack);
+  return tokens.every((token) => hay.includes(token));
+};
 const formatGender = (gender?:string|null) => {
   if(!gender) return "—";
   const value=gender.trim().toUpperCase();
@@ -68,6 +83,9 @@ function Sparkline({ values, color="#df6b32" }:{values:number[],color?:string}) 
 
 export default function Home() {
   const [query,setQuery]=useState("");
+  const [suggestOpen,setSuggestOpen]=useState(false);
+  const [highlightIndex,setHighlightIndex]=useState(-1);
+  const searchWrapRef=useRef<HTMLDivElement|null>(null);
   const [chamber,setChamber]=useState<Chamber>("all");
   const [state,setState]=useState("All India");
   const [sort,setSort]=useState<"assets"|"growth"|"liabilities">("assets");
@@ -196,6 +214,14 @@ export default function Home() {
     return ()=>window.removeEventListener("keydown",focusSearch);
   },[]);
 
+  useEffect(()=>{
+    const closeOnOutsideClick=(event:MouseEvent)=>{
+      if(searchWrapRef.current&&!searchWrapRef.current.contains(event.target as Node)) setSuggestOpen(false);
+    };
+    document.addEventListener("mousedown",closeOnOutsideClick);
+    return ()=>document.removeEventListener("mousedown",closeOnOutsideClick);
+  },[]);
+
   const candidateElections=useMemo(()=>candidateIndex?.states.find(s=>s.state===candidateState)?.elections??[],[candidateIndex,candidateState]);
   useEffect(()=>{
     if(!requestedSections.candidates) return;
@@ -254,7 +280,7 @@ export default function Home() {
     return mapRecords(snapshot,"assembly",true);
   },[snapshot,mpSnapshot,rsSnapshot,chamber,mapRecords]);
   const states=["All India",...Array.from(new Set(allData.map(m=>m.state))).sort()];
-  const filtered=useMemo(()=>allData.filter(m=>(state==="All India"||m.state===state)&&normalizeName(`${m.name} ${m.constituency} ${m.party} ${m.state} ${HOUSE_BADGE[m.chamber]}`).includes(normalizeName(query))).sort((a,b)=>sort==="liabilities"?compareAvailableMoneyDescending(a.liabilities,b.liabilities):b[sort]-a[sort]),[allData,query,state,sort]);
+  const filtered=useMemo(()=>allData.filter(m=>(state==="All India"||m.state===state)&&matchesSearch(`${m.name} ${m.constituency} ${m.party} ${m.state} ${HOUSE_BADGE[m.chamber]}`,query)).sort((a,b)=>sort==="liabilities"?compareAvailableMoneyDescending(a.liabilities,b.liabilities):b[sort]-a[sort]),[allData,query,state,sort]);
   const stateStats=useMemo(()=>Array.from(new Set(allData.map(m=>m.state))).map(s=>{const d=allData.filter(m=>m.state===s);return {state:s, avg:d.reduce((a,b)=>a+b.assets,0)/d.length, growth:d.reduce((a,b)=>a+b.growth,0)/d.length,count:d.length}}).sort((a,b)=>b.avg-a.avg).slice(0,8),[allData]);
   const headline=allData.length?allData.reduce((a,b)=>b.assets>a.assets?b:a):null;
   const knownNetWorthData=useMemo(()=>allData.filter((record):record is MLA&{liabilities:number}=>record.liabilities!==null),[allData]);
@@ -264,13 +290,21 @@ export default function Home() {
   const archiveStates=useMemo(()=>[...new Set((activeArchive?.records??[]).map(r=>r.state))].sort(),[activeArchive]);
   const resolvedArchiveState=archiveStates.includes(archiveState)?archiveState:(archiveStates[0]??archiveState);
   const seatGroups=useMemo(()=>{
-    const matching=(activeArchive?.records??[]).filter(row=>row.state===resolvedArchiveState&&row.normalizedConstituency.includes(normalizeName(seatQuery)));
+    const matching=(activeArchive?.records??[]).filter(row=>row.state===resolvedArchiveState&&matchesSearch(`${row.constituency} ${row.normalizedConstituency}`,seatQuery));
     return buildDisplayableSeatHistories(matching).sort((a,b)=>compareWinnerElections(b.at(-1)!,a.at(-1)!)||a[0].constituency.localeCompare(b[0].constituency));
   },[activeArchive,resolvedArchiveState,seatQuery]);
   const medianGrowth=useMemo(()=>{if(chamber!=="assembly") return 0; const values=(history?.comparisons??[]).map(x=>x.percentChange).filter(Number.isFinite).sort((a,b)=>a-b);return values.length?Math.round(values[Math.floor(values.length/2)]):0},[history,chamber]);
+  const reelectedStats=useMemo(()=>{
+    const reelected=allData.filter(m=>m.historical&&m.values.length>1&&m.values[0]>0);
+    if(!reelected.length) return {count:0,medianGrowthPct:0,medianIncrease:0};
+    const growthPct=reelected.map(m=>m.growth).sort((a,b)=>a-b);
+    const increases=reelected.map(m=>m.assets-m.values[0]).sort((a,b)=>a-b);
+    const mid=(arr:number[])=>arr.length?arr[Math.floor(arr.length/2)]:0;
+    return {count:reelected.length,medianGrowthPct:Math.round(mid(growthPct)),medianIncrease:mid(increases)};
+  },[allData]);
   const partyStats=useMemo(()=>Object.entries(parties).map(([party,color])=>{const records=allData.filter(record=>record.party===party);return {party,color,count:records.length,average:records.length?records.reduce((sum,record)=>sum+record.assets,0)/records.length:0}}).filter(item=>item.count>0),[allData]);
   const largestPartyAverage=Math.max(1,...partyStats.map(item=>item.average));
-  const candidateResults=useMemo(()=>[...(candidateShard?.records??[])].filter(row=>normalizeName(`${row.name} ${row.constituency} ${row.party}`).includes(normalizeName(candidateQuery))).sort((a,b)=>compareAvailableMoneyDescending(availableMoney(a.assets,a.assetsStatus),availableMoney(b.assets,b.assetsStatus))||a.ordinal-b.ordinal||a.candidateId-b.candidateId),[candidateShard,candidateQuery]);
+  const candidateResults=useMemo(()=>[...(candidateShard?.records??[])].filter(row=>matchesSearch(`${row.name} ${row.constituency} ${row.party}`,candidateQuery)).sort((a,b)=>compareAvailableMoneyDescending(availableMoney(a.assets,a.assetsStatus),availableMoney(b.assets,b.assetsStatus))||a.ordinal-b.ordinal||a.candidateId-b.candidateId),[candidateShard,candidateQuery]);
   const retryData=(key:DatasetKey)=>{
     setDataErrors(current=>({...current,[key]:undefined}));
     setDataAttempts(current=>({...current,[key]:current[key]+1}));
@@ -278,6 +312,36 @@ export default function Home() {
   const selectRepresentative=(representative:MLA)=>{
     setActiveId(rowId(representative));
     document.getElementById("profile")?.scrollIntoView({behavior:"smooth",block:"start"});
+  };
+  const searchHaystack=(m:MLA)=>`${m.name} ${m.constituency} ${m.party} ${m.state} ${HOUSE_BADGE[m.chamber]}`;
+  const searchMatches=useMemo(()=>{
+    if(!query.trim()) return [];
+    return allData
+      .filter((m)=>matchesSearch(searchHaystack(m),query))
+      .sort((a,b)=>{
+        const aName=matchesSearch(a.name,query), bName=matchesSearch(b.name,query);
+        if(aName!==bName) return aName?-1:1;
+        return b.assets-a.assets;
+      });
+  },[allData,query]);
+  const suggestions=useMemo(()=>searchMatches.slice(0,6),[searchMatches]);
+  const goToRepresentative=(representative:MLA)=>{
+    setState("All India");
+    setQuery(representative.name);
+    setMlaLimit(12);
+    setSuggestOpen(false);
+    setHighlightIndex(-1);
+    selectRepresentative(representative);
+  };
+  const applyTryQuery=(value:string)=>{
+    setState("All India");
+    setQuery(value);
+    setMlaLimit(12);
+    const matches=allData.filter((m)=>matchesSearch(searchHaystack(m),value));
+    const byName=matches.filter((m)=>matchesSearch(m.name,value));
+    const pick=byName[0]??(matches.length===1?matches[0]:null);
+    if(pick) selectRepresentative(pick);
+    else document.getElementById("explore")?.scrollIntoView({behavior:"smooth"});
   };
   const profileHref=(representative:MLA)=>
     representative.chamber==="lok_sabha"
@@ -337,12 +401,27 @@ export default function Home() {
       </div>
       <div className="heroGrid">
         <div><h1>Follow the money.<br/><em>Know your neta.</em></h1><p className="dek">India&apos;s most ambitious public record of the wealth declared by elected representatives—across assemblies, Parliament, parties and elections.</p>
-          <div className="searchBox"><span aria-hidden="true">⌕</span><input id="search" aria-label="Search representatives" value={query} onChange={e=>{setQuery(e.target.value);setMlaLimit(12)}} placeholder={chamber==="all"?"Search any legislator, seat, party or state…":chamber==="assembly"?"Search an MLA, constituency, party or state…":"Search an MP, state, party…"}/>{query&&<button className="clearSearch" type="button" onClick={()=>setQuery("")} aria-label="Clear representative search">×</button>}<kbd className="searchHint">⌘/Ctrl K</kbd></div>
-          <div className="quick"><span>TRY</span>{(chamber==="lok_sabha"?["Narendra Modi","Guntur","BJP"]:chamber==="rajya_sabha"?["Jaya Bachchan","Telangana","BJP"]:chamber==="all"?["D K Shivakumar","Narendra Modi","Jaya Bachchan"]:["D K Shivakumar","Karnataka","BJP"]).map(x=><button key={x} onClick={()=>{setQuery(x);setMlaLimit(12);document.getElementById("explore")?.scrollIntoView({behavior:"smooth"})}}>{x}</button>)}</div>
+          <div className="searchWrap" ref={searchWrapRef}>
+            <div className="searchBox"><span aria-hidden="true">⌕</span><input id="search" aria-label="Search representatives" role="combobox" aria-expanded={suggestOpen&&Boolean(query.trim())} aria-controls="searchSuggest" aria-autocomplete="list" autoComplete="off" value={query} onChange={e=>{setQuery(e.target.value);setMlaLimit(12);setSuggestOpen(true);setHighlightIndex(-1)}} onFocus={()=>{if(query.trim())setSuggestOpen(true)}} onKeyDown={e=>{
+              if(e.key==="ArrowDown"){e.preventDefault();setSuggestOpen(true);setHighlightIndex(i=>suggestions.length?(i+1)%suggestions.length:-1)}
+              else if(e.key==="ArrowUp"){e.preventDefault();setSuggestOpen(true);setHighlightIndex(i=>suggestions.length?(i-1+suggestions.length)%suggestions.length:-1)}
+              else if(e.key==="Enter"){const pick=suggestions[highlightIndex]??suggestions[0];if(pick){e.preventDefault();goToRepresentative(pick)}}
+              else if(e.key==="Escape"){setSuggestOpen(false);setHighlightIndex(-1);(e.target as HTMLInputElement).blur()}
+            }} placeholder={chamber==="all"?"Search any legislator, seat, party or state…":chamber==="assembly"?"Search an MLA, constituency, party or state…":"Search an MP, state, party…"}/>{query&&<button className="clearSearch" type="button" onClick={()=>{setQuery("");setSuggestOpen(false);setHighlightIndex(-1)}} aria-label="Clear representative search">×</button>}<kbd className="searchHint">⌘/Ctrl K</kbd></div>
+            {suggestOpen&&query.trim()&&<div className="searchSuggest" role="listbox" id="searchSuggest" aria-label="Search suggestions">
+              {suggestions.length?suggestions.map((m,i)=><button key={rowId(m)} type="button" role="option" aria-selected={i===highlightIndex} className={i===highlightIndex?"active":""} onMouseEnter={()=>setHighlightIndex(i)} onClick={()=>goToRepresentative(m)}>
+                <i style={{background:parties[m.party]||"#777"}}></i>
+                <span className="suggestName"><strong>{m.name}</strong><small>{HOUSE_BADGE[m.chamber]} · {m.constituency}, {m.state}</small></span>
+                <b>{fmt(m.assets)}</b>
+              </button>):<div className="suggestEmpty">No matches for &ldquo;{query.trim()}&rdquo; — try a full name, seat or party.</div>}
+              {searchMatches.length>suggestions.length&&<a className="suggestFooter" href="#explore" onClick={()=>setSuggestOpen(false)}>View all {searchMatches.length.toLocaleString("en-IN")} matches in the table ↓</a>}
+            </div>}
+          </div>
+          <div className="quick"><span>TRY</span>{(chamber==="lok_sabha"?["Narendra Modi","Guntur","BJP"]:chamber==="rajya_sabha"?["Jaya Bachchan","Telangana","BJP"]:chamber==="all"?["D K Shivakumar","Narendra Modi","Jaya Bachchan"]:["D K Shivakumar","Karnataka","BJP"]).map(x=><button key={x} onClick={()=>applyTryQuery(x)}>{x}</button>)}</div>
         </div>
         {headline?<aside className="headlineCard"><div className="cardKicker">BIGGEST DECLARED FORTUNE</div><div className="rank">01</div><h2>{headline.name}</h2><p>{HOUSE_BADGE[headline.chamber]} · {headline.constituency} · {headline.state}</p><div className="bigMoney">{fmt(headline.assets)}</div><div className="rise">{headline.historical!==false?`↗ ${headline.growth}%`:(headline.chamber==="lok_sabha"?"2024 Lok Sabha winners":headline.chamber==="rajya_sabha"?"ADR March 2026":"2025 national snapshot")} <span>{headline.historical!==false?"since previous affidavit":"top declaration"}</span></div><Sparkline values={headline.values}/><button onClick={()=>window.location.assign(profileHref(headline))}>View the full record →</button></aside>:<aside className="headlineCard" role={(chamber==="all"?allError:dataErrors[chamberErrorKey])?"alert":"status"}><div className="cardKicker">PUBLIC RECORD SNAPSHOT</div><h2>{(chamber==="all"?allError:dataErrors[chamberErrorKey])?"Data unavailable":"Loading public records…"}</h2><p>{(chamber==="all"?allError:dataErrors[chamberErrorKey])??(chamber==="all"?"Opening MLA, 2024 Lok Sabha winner and Rajya Sabha indexes.":chamber==="lok_sabha"?"Opening the 2024 Lok Sabha winner index.":chamber==="rajya_sabha"?"Opening the Rajya Sabha sitting-MP index.":"Opening the nationwide sitting-MLA index.")}</p>{(chamber==="all"?allError:dataErrors[chamberErrorKey])&&<button onClick={()=>{if(chamber==="all"){retryData("snapshot");retryData("mpSnapshot");retryData("rsSnapshot")}else retryData(chamberErrorKey)}}>Retry data →</button>}</aside>}
       </div>
-      <div className="ticker"><span>IN NUMBERS</span><div><b>{allData.length?fmt(totalDeclaredNetWorth):((chamber==="all"?allError:dataErrors[chamberErrorKey])?"Unavailable":"Loading")}</b><small>known declared net worth · liabilities available for {knownNetWorthData.length.toLocaleString("en-IN")} of {allData.length.toLocaleString("en-IN")} records</small></div>{chamber==="all"?<div className="tickerHouses"><div className="tickerHouseRow"><span><b>{mlaCount.toLocaleString("en-IN")}</b> MLA</span><span><b>{lsCount.toLocaleString("en-IN")}</b> LS</span><span><b>{rsCount.toLocaleString("en-IN")}</b> RS</span></div><small>records across three datasets</small></div>:<div><b>{chamber==="lok_sabha"?lsCount.toLocaleString("en-IN"):chamber==="rajya_sabha"?rsCount.toLocaleString("en-IN"):mlaCount.toLocaleString("en-IN")}</b><small>{chamber==="lok_sabha"?"2024 winner records":chamber==="rajya_sabha"?"Rajya Sabha members analyzed":"sitting MLAs"}</small></div>}<div><b>{candidateIndex?.meta.candidateRecords.toLocaleString("en-IN")??(dataErrors.candidateIndex?"Unavailable":"Loading")}</b><small>candidate affidavits</small></div>{chamber!=="rajya_sabha"&&<div><b>{winnerTicker}</b><small>{winnerTickerLabel}</small></div>}<div><b>{historyTicker}</b><small>{historyTickerLabel}</small></div></div>
+      <div className="ticker"><span>IN NUMBERS</span><div><b>{allData.length?fmt(totalDeclaredNetWorth):((chamber==="all"?allError:dataErrors[chamberErrorKey])?"Unavailable":"Loading")}</b><small>known declared net worth · liabilities available for {knownNetWorthData.length.toLocaleString("en-IN")} of {allData.length.toLocaleString("en-IN")} records</small></div>{chamber==="all"?<div className="tickerHouses"><div className="tickerHouseRow"><span><b>{mlaCount.toLocaleString("en-IN")}</b> MLA</span><span><b>{lsCount.toLocaleString("en-IN")}</b> LS</span><span><b>{rsCount.toLocaleString("en-IN")}</b> RS</span></div><small>records across three datasets</small></div>:<div><b>{chamber==="lok_sabha"?lsCount.toLocaleString("en-IN"):chamber==="rajya_sabha"?rsCount.toLocaleString("en-IN"):mlaCount.toLocaleString("en-IN")}</b><small>{chamber==="lok_sabha"?"2024 winner records":chamber==="rajya_sabha"?"Rajya Sabha members analyzed":"sitting MLAs"}</small></div>}<div><b>{candidateIndex?.meta.candidateRecords.toLocaleString("en-IN")??(dataErrors.candidateIndex?"Unavailable":"Loading")}</b><small>candidate affidavits</small></div>{chamber!=="rajya_sabha"&&<div><b>{winnerTicker}</b><small>{winnerTickerLabel}</small></div>}<div><b>{historyTicker}</b><small>{historyTickerLabel}</small></div><div><b>{reelectedStats.count?`${reelectedStats.medianGrowthPct>=0?"+":""}${reelectedStats.medianGrowthPct}%`:"—"}</b><small>median growth for {reelectedStats.count.toLocaleString("en-IN")} re-elected reps · {reelectedStats.count?`${reelectedStats.medianIncrease>=0?"+":"−"}${fmt(Math.abs(reelectedStats.medianIncrease))} typical rise`:"awaiting trails"}</small></div></div>
     </section>
 
     <section id="explore" className="section explorer" ref={explorerSection}>

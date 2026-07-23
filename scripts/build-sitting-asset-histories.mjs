@@ -276,7 +276,6 @@ async function main() {
     nameIndex,
     chamber: "rajya_sabha",
     fallbackSourceUrl: rsSnapshot.meta?.sourceUrl || "https://www.myneta.info/rajsab09aff/",
-    sameStateOnly: true,
   });
 
   const payload = {
